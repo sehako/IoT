@@ -133,9 +133,6 @@
     <None Include="..\..\..\IoT\1주차 진행상황.md" />
     <None Include="..\..\..\IoT\README.md" />
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\..\IoT\money.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
