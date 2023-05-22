@@ -20,9 +20,9 @@ int main(void) {
     int hit_check = 1;
     int user_card, dealer_card;
     char alpha, alphabet, shape, dealer_shape;
+    bool user_busted = false;
 
     bool win; //승리 여부
-    bool loop = true; //기본적으로 반복 게임
     FILE* file;
 
     //배팅 금액이 저장된 파일 로드
@@ -37,9 +37,9 @@ int main(void) {
         int user_score = 0;
         int dealer_score = 0;
 
-        DeckGen(&arr); //덱 생성 함수
+        DeckGen(&arr); //덱 생성
 
-        //해당 입력을 다이얼 버튼으로 받을 예정
+        //배팅 시스템 구현
         printf("배팅금 입력(소지액: %ld)\n", money);
         scanf("%ld", &bet_money);
 
@@ -63,12 +63,6 @@ int main(void) {
             money += bet_money * 2;
             continue;
         }
-        //푸시 채크 부분
-        else if (CheckBlackJack(user_score) && CheckBlackJack(dealer_score)) {
-            printf("%ld\n", user_score);
-            printf("%ld\n", dealer_score);
-            printf("Push\n");
-        }
         else {
             while (true) {
                 printf("%ld\n", user_score);
@@ -84,34 +78,42 @@ int main(void) {
                     printf("%ld\n", user_score);
                     printf("Busted!\n");
                     money -= bet_money;
+                    user_busted = true;
                     break;
                 }
             }
         }
 
-        //딜러가 가진 카드의 합이 16이하인 경우 드로우하는 규칙 구현
-        while (dealer_score <= 16) {
-            dealer_score += Draw(&dealer_shape, &alphabet, arr);
-        }
-
-        //승패 계산 부분
-        if(dealer_score > 21) {
-            printf("Dealer busted\n");
-            money += bet_money * 2;
-        }
-        else if(user_score > dealer_score) {
-            printf("You win!\n");
-            money += bet_money * 2;
-        }
-        else if(user_score == dealer_score) {
-            printf("Push\n");
-            money += bet_money * 2;
+        if (user_busted) {
+            user_busted = false;
+            break;
         }
         else {
-            printf("You lose!\n");
-            money -= bet_money;
+            //딜러가 가진 카드의 합이 16이하인 경우 드로우하는 규칙 구현
+            while (dealer_score <= 16) {
+                dealer_score += Draw(&dealer_shape, &alphabet, arr);
+            }
+
+            //승패 계산 부분
+            if(dealer_score > 21) {
+                printf("Dealer busted\n");
+                money += bet_money * 2;
+            }
+            else if(user_score > dealer_score) {
+                printf("You win!\n");
+                money += bet_money * 2;
+            }
+            else if(user_score == dealer_score) {
+                printf("Push\n");
+                money += bet_money * 2;
+            }
+            else {
+                printf("You lose!\n");
+                money -= bet_money;
+            }
         }
 
+        
         //배팅금 전부 소진 시 게임 오버 출력 후 배팅금 5000원 충전 & 종료
         if (money == 0) {
             printf("GameOver!\n");
