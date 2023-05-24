@@ -7,8 +7,8 @@
 #include <stdbool.h>
 
 void Finish(bool, long);
-void DeckGen(int [4][13]);
-int Draw(char* , char* , int[4][13]);
+void DeckGen(int arr[4][13]);
+int Draw(char* , char* , int arr[4][13]);
 bool CheckBlackJack(int);
 bool Fight(int, int);
 
@@ -22,7 +22,7 @@ int main(void) {
     char alpha, alphabet, shape, dealer_shape;
     bool user_busted = false;
 
-    bool win; //승리 여부
+    bool win = false; //승리 여부
     FILE* file;
 
     //배팅 금액이 저장된 파일 로드
@@ -42,17 +42,16 @@ int main(void) {
         //배팅 시스템 구현
         printf("배팅금 입력(소지액: %ld)\n", money);
         scanf("%ld", &bet_money);
+        money -= bet_money;
 
         // 처음 게임 시작 시 카드 분배 구현
         user_card = Draw(&shape, &alpha, arr);
         dealer_card = Draw(&dealer_shape, &alphabet, arr);
         user_score += user_card;
         dealer_score += dealer_card;
-        printf("%c, %d\n", shape, user_card);
         user_card = Draw(&shape, &alpha, arr);
         dealer_card = Draw(&dealer_shape, &alphabet, arr);
-        printf("%c, %d\n", shape, user_card);
-        printf("%c, %d\n", shape, dealer_card);
+        printf("딜러 공개 카드: %c, %d\n", shape, dealer_card);
         user_score += user_card;
         dealer_score += dealer_card;
 
@@ -77,18 +76,16 @@ int main(void) {
                 if (user_score > 21) {
                     printf("%ld\n", user_score);
                     printf("Busted!\n");
-                    money -= bet_money;
                     user_busted = true;
-                    break;
                 }
             }
         }
 
         if (user_busted) {
             user_busted = false;
-            break;
         }
         else {
+
             //딜러가 가진 카드의 합이 16이하인 경우 드로우하는 규칙 구현
             while (dealer_score <= 16) {
                 dealer_score += Draw(&dealer_shape, &alphabet, arr);
@@ -105,18 +102,16 @@ int main(void) {
             }
             else if(user_score == dealer_score) {
                 printf("Push\n");
-                money += bet_money * 2;
+                money += bet_money;
             }
             else {
                 printf("You lose!\n");
-                money -= bet_money;
             }
         }
 
         
         //배팅금 전부 소진 시 게임 오버 출력 후 배팅금 5000원 충전 & 종료
         if (money == 0) {
-            printf("GameOver!\n");
             Finish(true, money);
             break;
         }
@@ -125,7 +120,6 @@ int main(void) {
         printf("재도전? (0입력 시 종료)\n");
         scanf("%d", &play_check);
         if (play_check == 0) {
-            printf("GameFinished\n");
             Finish(false, money);
             break;
         }
@@ -144,9 +138,11 @@ void Finish(bool over, long num) {
     if (over) {
         num = 5000;
         fprintf(file, "%ld", num);
+        printf("GameOver!\n");
     }
     else {
         fprintf(file, "%ld", num);
+        printf("GameFinished\n");
     }
     fclose(file);
 }

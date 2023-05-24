@@ -1,5 +1,0 @@
-﻿  Main.c
-C:\Users\dhtpg\바탕 화면\IoT\Blackjack\Main.c(40,17): warning C4048: 배열 첨자가 다릅니다. 'int (*)[13]'과(와) 'int (*)[4][13]'
-C:\Users\dhtpg\바탕 화면\IoT\Blackjack\Main.c(24,10): warning C4101: 'win' :참조되지 않은 지역 변수입니다.
-C:\Users\dhtpg\바탕 화면\IoT\Blackjack\Main.c(165,11): warning C4244: '함수': 'time_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  Blackjack.vcxproj -> C:\Users\dhtpg\바탕 화면\IoT\x64\Debug\Blackjack.exe
