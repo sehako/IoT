@@ -7,7 +7,6 @@
 #include <stdbool.h>
 
 void Finish(bool, long);
-void DeckGen(int arr[4][13]);
 int Draw(char* , char* , int arr[4][13]);
 int Betting(); //배팅을 딥 스위치로 구현할 함수
 void CardShow(char* , char* , int); //뽑은 카드를 Dot Matrix와 디지털 패드로 구현할 함수
@@ -15,7 +14,6 @@ void CardShow(char* , char* , int); //뽑은 카드를 Dot Matrix와 디지털 �
 int main(void) {
     long money = 0;
     long bet_money = 0;
-    int arr[4][13]; //행 부분은 카드 문양 열 부분은 카드 값
     int play_check = 1;
     int hit_check = 1;
     bool user_busted = false;
@@ -38,7 +36,12 @@ int main(void) {
 
         //딥 스위치로 배팅금 입력
 
-        DeckGen(&arr); //덱 생성
+        int arr[4][13] = {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13},
+        {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13},
+        {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13},
+        {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
+        }; //행 부분은 카드 문양 열 부분은 카드 값
+
         //첫 번째 카드 분배
         user_card = Draw(&shape, &alpha, arr);
         dealer_card = Draw(&dealer_shape, &dealer_alpha, arr);
@@ -132,16 +135,6 @@ int main(void) {
     return 0;
 }
 
-//덱 생성 함수
-void DeckGen(int arr[4][13]) {
-    for (int i = 0; i < 4; i++) {
-        int count = 1;
-        for (int j = 0; j < 13; j++) {
-            arr[i][j] = count++;
-        }
-    }
-}
-
 //덱 드로우 함수
 int Draw(char* shape_pt, char* alpha_pt, int arr[4][13]) {
     int draw = 0;
@@ -150,7 +143,7 @@ int Draw(char* shape_pt, char* alpha_pt, int arr[4][13]) {
         int shape = rand() % 4;
         int card = rand() % 13;
 
-        if (arr[shape][card] != 0) {
+        if (arr[shape][card] != 0) { //0값이 아닌 배열이 나올때까지 반복
             switch (shape) {
             case 0:
                 *shape_pt = 'S';
@@ -166,7 +159,7 @@ int Draw(char* shape_pt, char* alpha_pt, int arr[4][13]) {
                 break;
             }
             draw = arr[shape][card];
-            arr[shape][card] = 0;
+            arr[shape][card] = 0; //뽑힌 배열값을 0으로 변경(중복 방지)
             break;
         }
         else {
@@ -174,19 +167,23 @@ int Draw(char* shape_pt, char* alpha_pt, int arr[4][13]) {
         }
     }
 
-    if (draw >= 11) {
-        switch (draw) {
+    switch (draw) {
+        case 0:
+            *alpha_pt = 'A';
+            draw = 11;
+            break;
         case 11:
             *alpha_pt = 'J';
+            draw = 10;
             break;
         case 12:
             *alpha_pt = 'Q';
+            draw = 10;
             break;
         default:
             *alpha_pt = 'K';
+            draw = 10;
             break;
-        }
-        draw = 10;
     }
     return draw;
 }
