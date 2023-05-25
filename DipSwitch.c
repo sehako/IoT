@@ -27,6 +27,7 @@ int main()
         }
 
         printf("%d\n",c);
+        close(dip_d);
         return 0;
     }
 }

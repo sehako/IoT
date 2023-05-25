@@ -6,12 +6,15 @@
 #include <time.h>
 #include <string.h>
 #include <stdbool.h>
+#include <fcntl.h>
 
+#define clcd "/dev/clcd"
+#define dip "/dev/dipsw"
 
-void ResetHand(char*, char*);
-int Betting(); //배팅을 딥 스위치로 구현할 함수
+int Betting(long); //배팅을 딥 스위치로 구현할 함수
 int Draw(char*, char*, char(*)[13], char*);
-void CardShow(char*, char*); //뽑은 카드를 Dot Matrix와 디지털 패드로 구현할 함수
+void CardShow(char, char); //뽑은 카드를 Dot Matrix로 보여줄 함수
+void DealerCardShow(char, char);
 bool HandCheck(char*);
 void Finish(bool, long);
 
@@ -36,9 +39,10 @@ int main(void) {
         user_score = 0;
         dealer_score = 0;
 
+        //LCD로 배팅금 입력 부분 출력
+        printf("배팅금 입력 %ld\n", money); 
         //딥 스위치로 배팅금 입력
-        printf("배팅금 입력 %ld\n", money);
-        scanf("%ld", &bet_money);
+        bet_money = Betting(money);
         money -= bet_money;
 
         //행 부분은 카드 문양 열 부분은 카드 값
@@ -51,13 +55,13 @@ int main(void) {
         user_score += Draw(&shape, &alpha, deck, user_hand);
         dealer_score += Draw(&dealer_shape, &dealer_alpha, deck, dealer_hand);
 
-        //딜러의 첫 번째 카드 저장 플레이어와 승부시 출력할 용도
-        first_dealer_alpha = dealer_alpha;
-        first_dealer_shape = dealer_shape;
+        //첫 번째 카드 출력(딜러는 LCD, 플레이어는 Dot Matrix)
 
         //두 번째 카드 분배
         user_score += Draw(&shape, &alpha, deck, user_hand);
         dealer_score += Draw(&dealer_shape, &dealer_alpha, deck, dealer_hand);
+
+        //두 번째 카드 출력(플레이어만)
 
         //초반 시작 부분에서 에이스 두 장 뽑으면 자동으로 11, 1로 취급
         if (user_score > 21) {
@@ -145,6 +149,27 @@ int main(void) {
     return 0;
 }
 
+long Betting(long money) {
+    long bet_money;
+    int dip_d;
+    unsigned char c;
+
+    if((dip_d = open(dip,O_RDWR)) < 0) {
+        perror("open");
+        exit(1);
+    }
+    while(1) {
+        while(1) {
+            read(dip_d,&c,sizeof(c));
+            if(c) break;
+        }
+
+        printf("%d\n",c);
+        close(dip_d);
+        return bet_money;
+    }
+}
+
 //덱 드로우 함수
 int Draw(char* shape_pt, char* alpha_pt, char(*arr)[13], char* hand) {
     int value = 0;
@@ -201,7 +226,22 @@ int Draw(char* shape_pt, char* alpha_pt, char(*arr)[13], char* hand) {
 }
 
 //Dot Matrix로 카드 구현
-void CardShow(char* shape, char* alpha) {
+void CardShow(char shape, char alpha) {
+}
+
+void DealerCardShow(char shape, char alpha) {
+    int clcd_d;
+    char buf[10];
+
+    if((clcd_d = open(clcd,O_RDWR)) < 0)
+    {
+        perror("open");
+        exit(1);
+    }
+
+    scanf("%s",buf);
+    write(clcd_d,&buf,strlen(buf));
+    close(clcd_d);
 }
 
 bool HandCheck(char* arr) {
