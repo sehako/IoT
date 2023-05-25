@@ -9,7 +9,9 @@
 void ResetHand(char[10], char[10]);
 int Betting(); //배팅을 딥 스위치로 구현할 함수
 int Draw(char* , char* , int arr[4][13]);
+void AceCheck(char*, int*, int*);
 void CardShow(char* , char* , int); //뽑은 카드를 Dot Matrix와 디지털 패드로 구현할 함수
+bool HandCheck(char*);
 void Finish(bool, long);
 
 int main(void) {
@@ -44,16 +46,8 @@ int main(void) {
         //첫 번째 카드 분배
         user_card = Draw(&shape, &alpha, arr);
         dealer_card = Draw(&dealer_shape, &dealer_alpha, arr);
-        if(alpha == 'A') {
-            user_hand[user_count] = 'A';
-            user_count++;
-            alpha = ' ';
-        }
-        if(dealer_alpha == 'A') {
-            dealer_hand[dealer_count] = 'A';
-            dealer_count++;
-            dealer_alpha = ' ';
-        }
+        AceCheck(&alpha, user_hand, &user_count);
+        AceCheck(&dealer_alpha, dealer_hand, &dealer_count);
         user_score += user_card;
         dealer_score += dealer_card;
         CardShow(&shape, &alpha, &user_card);
@@ -65,16 +59,8 @@ int main(void) {
         //두 번째 카드 분배
         user_card = Draw(&shape, &alpha, arr);
         dealer_card = Draw(&dealer_shape, &dealer_alpha, arr);
-        if(alpha == 'A') {
-            user_hand[user_count] = 'A';
-            user_count++;
-            alpha = ' ';
-        }
-        if(dealer_alpha == 'A') {
-            dealer_hand[dealer_count] = 'A';
-            dealer_count++;
-            dealer_alpha = ' ';
-        }
+        AceCheck(&alpha, user_hand, &user_count);
+        AceCheck(&dealer_alpha, dealer_hand, &dealer_count);
         CardShow(&shape, &alpha, user_card);
         sleep(3);
         CardShow(&dealer_shape, &dealer_alpha, dealer_card);
@@ -91,8 +77,11 @@ int main(void) {
                 //힛 or 스탠드 구현
                 //int or char hit: 딥 스위치로 입력받을 변수
                 if(user_score > 21) {
-                    user_busted = true;
-                    break;
+                    if(HandCheck(user_hand)) user_score -= 10;
+                    else {
+                        user_busted = true;
+                        break;
+                    } 
                 }
 
                 if(true) {
@@ -215,6 +204,14 @@ int Draw(char* shape_pt, char* alpha_pt, int arr[4][13]) {
     return draw;
 }
 
+void AceCheck(char* alphabet, int* arr, int* arr_count) {
+    if(*alphabet == 'A') {
+        arr[*arr_count] = 'A';
+        *arr_count++;
+        *alphabet = ' ';
+    }
+}
+
 //Dot Matrix로 카드 구현
 void CardShow(char* shape, char* alpha, int card) {
     switch(*alpha) {
@@ -230,8 +227,14 @@ void CardShow(char* shape, char* alpha, int card) {
     }
 }
 
-int Betting() {
-
+bool HandCheck(char* arr) {
+    for(int i = 0; i < 10; i++) {
+        if(arr[i] == 'A') {
+            arr[i] = ' ';
+            return true;
+        }
+        else return false;
+    }
 }
 
 //게임 종료 or 오버 시 파일 처리
