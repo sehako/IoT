@@ -10,6 +10,8 @@
 
 #define clcd "/dev/clcd"
 #define dip "/dev/dipsw"
+#define dot "/dev/dot"
+#define fnd "/dev/fnd"
 
 int Betting(long); //배팅을 딥 스위치로 구현할 함수
 int Draw(char*, char*, char(*)[13], char*);
@@ -17,6 +19,8 @@ void CardShow(char, char); //뽑은 카드를 Dot Matrix로 보여줄 함수
 void DealerCardShow(char, char);
 bool HandCheck(char*);
 void Finish(bool, long);
+
+unsigned char 
 
 int main(void) 
 {
@@ -32,6 +36,12 @@ int main(void)
     fscanf(file, "%ld", &money);
     fclose(file);
 
+    //fnd에 숫자를 띄우기위한 파일 로드 후 배열저장
+    int user_money[4] = {0};
+    file = fopen("money.txt", "r");
+    fscanf(file, "%1d%1d%1d%1d",&user_money[0], &user_money[1], &user_money[2], &user_money[3]);
+    fclose(file);
+
     //게임 실행 반복문
     while (true) 
     {
@@ -41,6 +51,8 @@ int main(void)
         user_score = 0;
         dealer_score = 0;
 
+        //초기금액 3초간 표시
+        FND_control(user_money,3);
         //LCD로 배팅금 입력 부분 출력
         printf("배팅금 입력 %ld\n", money); 
         //딥 스위치로 배팅금 입력
@@ -59,12 +71,14 @@ int main(void)
         dealer_score += Draw(&dealer_shape, &dealer_alpha, deck, dealer_hand);
 
         //첫 번째 카드 출력(딜러는 LCD, 플레이어는 Dot Matrix)
+        CardShow(shape, alpha);
 
         //두 번째 카드 분배
         user_score += Draw(&shape, &alpha, deck, user_hand);
         dealer_score += Draw(&dealer_shape, &dealer_alpha, deck, dealer_hand);
 
         //두 번째 카드 출력(플레이어만)
+        CardShow(shape, alpha);
 
         //초반 시작 부분에서 에이스 두 장 뽑으면 자동으로 11, 1로 취급
         if (user_score > 21) 
@@ -264,9 +278,171 @@ int Draw(char* shape_pt, char* alpha_pt, char(*arr)[13], char* hand)
     return value;
 }
 
+//dot_matrix에 띄울 문양
+unsigned char mtx[4][8] = {
+    {0x00,0x66,0xFF,0xFF,0x7E,0x3C,0x18,0x00}, //하트
+    {0x00,0x08,0x1C,0x3E,0x7F,0x3E,0x1C,0x08}, //스페이드
+    {0x18,0x00,0x18,0x3C,0x3C,0x18,0x00,0x00}, //클로버
+    {0x00,0x08,0x1C,0x3E,0x1C,0x08,0x00,0x00} //다이아몬드
+    };
+
+unsigned char mtn[13][8] = {
+    {0x18,0x24,0x42,0x42,0x7E,0x42,0x42,0x42}, //A
+    {0x18,0x24,0x24,0x04,0x08,0x10,0x3c,0x00}, //2
+    {0x18,0x24,0x04,0x18,0x04,0x24,0x18,0x00}, //3
+    {0x08,0x18,0x28,0x48,0xfc,0x08,0x08,0x00}, //4
+    {0x2c,0x20,0x20,0x18,0x04,0x24,0x18,0x00}, //5
+    {0x18,0x24,0x20,0x38,0x24,0x24,0x18,0x00}, //6
+    {0x3c,0x04,0x04,0x08,0x10,0x10,0x10,0x00}, //7
+    {0x18,0x24,0x24,0x18,0x24,0x24,0x18,0x00}, //8
+    {0x18,0x24,0x24,0x1c,0x04,0x04,0x18,0x00}, //9
+    {0x26,0x69,0xa9,0x29,0x29,0x29,0x76,0x00}, //10
+    {0x1C,0x08,0x08,0x08,0x08,0x48,0x48,0x30},  //J
+    {0x38,0x44,0x82,0x82,0x82,0x8A,0x44,0x3A},  //Q
+    {0x44,0x48,0x50,0x60,0x50,0x48,0x44,0x44}  //K
+    ;}
+
 //Dot Matrix로 카드 구현
 void CardShow(char shape, char alpha) 
 {
+    //예외처리
+    int dot_mtx;
+    if((dot_mtx = open(dot, O_RDWR)) < 0)
+    {
+        printf("Can't Open\n");
+        exit(0);
+    }
+
+    //모양에 따라 dot matrix 출력
+    switch (shape) {
+        case 'S':
+            write(dot_mtx, &mtx[1], sizeof(mtx[1])); //스페이드 출력
+            usleep(1000000); //1초동안 점등
+            switch (alpha) {
+                case 'A': write(dot_mtx, &mtn[0], sizeof(mtn[0])); usleep(100000); break;
+                case '2': write(dot_mtx, &mtn[1], sizeof(mtn[1])); usleep(100000); break;
+                case '3': write(dot_mtx, &mtn[2], sizeof(mtn[2])); usleep(100000); break;
+                case '4': write(dot_mtx, &mtn[3], sizeof(mtn[3])); usleep(100000); break;
+                case '5': write(dot_mtx, &mtn[4], sizeof(mtn[4])); usleep(100000); break;
+                case '6': write(dot_mtx, &mtn[5], sizeof(mtn[5])); usleep(100000); break;
+                case '7': write(dot_mtx, &mtn[6], sizeof(mtn[6])); usleep(100000); break;
+                case '8': write(dot_mtx, &mtn[7], sizeof(mtn[7])); usleep(100000); break;
+                case '9': write(dot_mtx, &mtn[8], sizeof(mtn[8])); usleep(100000); break;
+                case '10': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
+                case 'J': write(dot_mtx, &mtn[10], sizeof(mtn[10])); usleep(100000); break;
+                case 'Q': write(dot_mtx, &mtn[11], sizeof(mtn[11])); usleep(100000); break;
+                case 'K': write(dot_mtx, &mtn[12], sizeof(mtn[12])); usleep(100000); break;
+            }
+            break;
+        case 'C':
+            write(dot_mtx, &mtx[2], sizeof(mtx[2])); //클로버 출력
+            usleep(1000000); //1초동안 점등
+            switch (alpha) {
+                case 'A': write(dot_mtx, &mtn[0], sizeof(mtn[0])); usleep(100000); break;
+                case '2': write(dot_mtx, &mtn[1], sizeof(mtn[1])); usleep(100000); break;
+                case '3': write(dot_mtx, &mtn[2], sizeof(mtn[2])); usleep(100000); break;
+                case '4': write(dot_mtx, &mtn[3], sizeof(mtn[3])); usleep(100000); break;
+                case '5': write(dot_mtx, &mtn[4], sizeof(mtn[4])); usleep(100000); break;
+                case '6': write(dot_mtx, &mtn[5], sizeof(mtn[5])); usleep(100000); break;
+                case '7': write(dot_mtx, &mtn[6], sizeof(mtn[6])); usleep(100000); break;
+                case '8': write(dot_mtx, &mtn[7], sizeof(mtn[7])); usleep(100000); break;
+                case '9': write(dot_mtx, &mtn[8], sizeof(mtn[8])); usleep(100000); break;
+                case '10': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
+                case 'J': write(dot_mtx, &mtn[10], sizeof(mtn[10])); usleep(100000); break;
+                case 'Q': write(dot_mtx, &mtn[11], sizeof(mtn[11])); usleep(100000); break;
+                case 'K': write(dot_mtx, &mtn[12], sizeof(mtn[12])); usleep(100000); break;
+            }
+            break;
+        case 'D':
+            write(dot_mtx, &mtx[3], sizeof(mtx[3])); //다이아몬드 출력
+            usleep(1000000); //1초동안 점등
+            switch (alpha) {
+                case 'A': write(dot_mtx, &mtn[0], sizeof(mtn[0])); usleep(100000); break;
+                case '2': write(dot_mtx, &mtn[1], sizeof(mtn[1])); usleep(100000); break;
+                case '3': write(dot_mtx, &mtn[2], sizeof(mtn[2])); usleep(100000); break;
+                case '4': write(dot_mtx, &mtn[3], sizeof(mtn[3])); usleep(100000); break;
+                case '5': write(dot_mtx, &mtn[4], sizeof(mtn[4])); usleep(100000); break;
+                case '6': write(dot_mtx, &mtn[5], sizeof(mtn[5])); usleep(100000); break;
+                case '7': write(dot_mtx, &mtn[6], sizeof(mtn[6])); usleep(100000); break;
+                case '8': write(dot_mtx, &mtn[7], sizeof(mtn[7])); usleep(100000); break;
+                case '9': write(dot_mtx, &mtn[8], sizeof(mtn[8])); usleep(100000); break;
+                case '10': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
+                case 'J': write(dot_mtx, &mtn[10], sizeof(mtn[10])); usleep(100000); break;
+                case 'Q': write(dot_mtx, &mtn[11], sizeof(mtn[11])); usleep(100000); break;
+                case 'K': write(dot_mtx, &mtn[12], sizeof(mtn[12])); usleep(100000); break;
+            }
+            break;
+        default:
+            write(dot_mtx, &mtx[0], sizeof(mtx[0])); //하트 출력
+            usleep(1000000); //1초동안 점등
+            switch (alpha) {
+                case 'A': write(dot_mtx, &mtn[0], sizeof(mtn[0])); usleep(100000); break;
+                case '2': write(dot_mtx, &mtn[1], sizeof(mtn[1])); usleep(100000); break;
+                case '3': write(dot_mtx, &mtn[2], sizeof(mtn[2])); usleep(100000); break;
+                case '4': write(dot_mtx, &mtn[3], sizeof(mtn[3])); usleep(100000); break;
+                case '5': write(dot_mtx, &mtn[4], sizeof(mtn[4])); usleep(100000); break;
+                case '6': write(dot_mtx, &mtn[5], sizeof(mtn[5])); usleep(100000); break;
+                case '7': write(dot_mtx, &mtn[6], sizeof(mtn[6])); usleep(100000); break;
+                case '8': write(dot_mtx, &mtn[7], sizeof(mtn[7])); usleep(100000); break;
+                case '9': write(dot_mtx, &mtn[8], sizeof(mtn[8])); usleep(100000); break;
+                case '10': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
+                case 'J': write(dot_mtx, &mtn[10], sizeof(mtn[10])); usleep(100000); break;
+                case 'Q': write(dot_mtx, &mtn[11], sizeof(mtn[11])); usleep(100000); break;
+                case 'K': write(dot_mtx, &mtn[12], sizeof(mtn[12])); usleep(100000); break;
+            }
+            break;
+    }
+    close(dot_mtx);
+}
+
+// 승패 여부에 따라서 잔고의 100의 자리수를 조절해주는 함수
+/*
+void calculate_user_money(rps_state){
+	if (rps_state == 1) {	// 승리했을경우 배팅금액 더해주기
+		user_money[1] += led_count;
+	}
+	else if (rps_state == -1) {	// 패배했을경우 배팅금액 빼주기
+		user_money[1] -= led_count;
+	}
+	else { printf("unknown Error");	}
+} */
+
+// fnd에 한 자리수의 양수로 출력할 수 있도록, user_money 배열 조정해주는 함수
+void adjust_user_money(int money[]){
+	if (money[1] >= 10) {  // 100의 자리수가 10보다 커질때
+		money[0]++; // 1000의 자리수 올려주기
+		money[1] %= 10; // 나머지값을 100의 자릿수에 대입
+	}
+	else if (money[1] < 0) { // 100의 자리수가 0보다 작아질때
+		money[0]--; // 1000의 자릿수 내려주기
+		money[1] = (10 + money[1]); // 100의 자릿수 조정
+	}
+	else{ /*pass*/ }
+}
+
+// 세그먼트 제어 함수
+int FND_control(long money){
+	unsigned char FND_DATA_TBL[]={
+        	0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90,0x88,
+        	0x83,0xC6,0xA1,0x86,0x8E,0xC0,0xF9,0xA4,0xB0,0x99,0x89
+	};
+
+	int fnd_fd = 0;
+    unsigned char fnd_num[4];
+
+	// money 배열의 원소들을 순서에 맞게 넣어주기
+    fnd_num[0] = FND_DATA_TBL[money[0]];
+    fnd_num[1] = FND_DATA_TBL[money[1]];
+    fnd_num[2] = FND_DATA_TBL[money[2]];
+    fnd_num[3] = FND_DATA_TBL[money[3]];
+
+    fnd_fd = open(fnd_dev, O_RDWR);
+	if(fnd_fd <0){ printf("fnd error\n"); } // 예외처리
+
+    write(fnd_fd, &fnd_num, sizeof(fnd_num)); // 출력
+    sleep(time_sleep); // 점등시간 조절
+
+    close(fnd_fd);
 }
 
 void DealerCardShow(char shape, char alpha) 
