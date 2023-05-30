@@ -51,9 +51,8 @@ int main(void) {
         //초기금액 3초간 표시
         FND_control(user_money,3);
         //LCD로 배팅금 입력 부분 출력
-        printf("배팅금 입력 %ld\n", money); 
         //딥 스위치로 배팅금 입력
-        bet_money = Betting(money);
+        // bet_money = Betting(money);
         money -= bet_money;
 
         //행 부분은 카드 문양 열 부분은 카드 값
