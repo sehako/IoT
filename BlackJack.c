@@ -13,7 +13,7 @@
 #define dot "/dev/dot"
 #define fnd "/dev/fnd"
 
-int Betting(long); //배팅을 딥 스위치로 구현할 함수
+long Betting(long); //배팅을 딥 스위치로 구현할 함수
 int Draw(char*, char*, char(*)[13], char*);
 void CardShow(char, char); //뽑은 카드를 Dot Matrix로 보여줄 함수
 void DealerCardShow(char, char);
@@ -207,7 +207,8 @@ int Draw(char* shape_pt, char* alpha_pt, char(*arr)[13], char* hand) {
 
         if (arr[shape][card] != ' ') {
             *alpha_pt = arr[shape][card];
-            for (int i = 0; i < 10; i++) {
+            int i = 0;
+            for (i = 0; i < 10; i++) {
                 if (hand[i] == ' ') {
                     hand[i] = arr[shape][card];
                     break;
@@ -251,7 +252,10 @@ int Draw(char* shape_pt, char* alpha_pt, char(*arr)[13], char* hand) {
     return value;
 }
 
-//dot_matrix에 띄울 문양
+
+//Dot Matrix로 유저의 카드 출력 구현
+void CardShow(char shape, char alpha) {
+    //dot_matrix에 띄울 문양
 unsigned char mtx[4][8] = {
     {0x00,0x66,0xFF,0xFF,0x7E,0x3C,0x18,0x00}, //하트
     {0x00,0x08,0x1C,0x3E,0x7F,0x3E,0x1C,0x08}, //스페이드
@@ -275,8 +279,6 @@ unsigned char mtn[13][8] = {
     {0x44,0x48,0x50,0x60,0x50,0x48,0x44,0x44}  //K
     ;}
 
-//Dot Matrix로 유저의 카드 출력 구현
-void CardShow(char shape, char alpha) {
     //예외처리
     int dot_mtx;
     if((dot_mtx = open(dot, O_RDWR)) < 0)
@@ -436,7 +438,8 @@ void DealerCardShow(char shape, char alpha) {
 }
 
 bool HandCheck(char* arr) {
-    for (int i = 0; i < 10; i++) {
+    int i = 0;
+    for (i = 0; i < 10; i++) {
         if (arr[i] == 'A') {
             arr[i] = ' ';
             return true;
@@ -445,9 +448,10 @@ bool HandCheck(char* arr) {
     }
 }
 
+
 void ResultPrint(int check) {
     int clcd_d;
-
+    char buf[16] = "";
     if((clcd_d = open(clcd,O_RDWR)) < 0) {
         perror("open");
         exit(1);
@@ -455,18 +459,18 @@ void ResultPrint(int check) {
 
     switch(check) {
         case 0:
-        char buf[10] = "You Win!";
         write(clcd_d, &buf, strlen(buf));
+        buf = "You Win!";
         break;
         case 1:
-        char buf[10] = "Push!";
+        buf = "Push!";
         write(clcd_d, &buf, strlen(buf));
         break;
         case 2:
-        char buf[10] = "Game Over!";
+        buf = "Game Over!";
         write(clcd_d, &buf, strlen(buf));
         default:
-        char buf[10] = "You Lose!";
+        buf = "You Lose!";
         write(clcd_d, &buf, strlen(buf));
         break;
     }
