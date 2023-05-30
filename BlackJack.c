@@ -56,11 +56,11 @@ int main(void) {
         money -= bet_money;
 
         //행 부분은 카드 문양 열 부분은 카드 값
-        char deck[4][13] = { 
-            {'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Q', 'K', 'J'},
-            {'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Q', 'K', 'J'},
-            {'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Q', 'K', 'J'},
-            {'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Q', 'K', 'J'} };
+        unsigned char deck[4][13] = { 
+            {'A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'K', 'J'},
+            {'A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'K', 'J'},
+            {'A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'K', 'J'},
+            {'A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'K', 'J'} };
 
         //첫 번째 카드 분배
         user_score += Draw(&shape, &alpha, deck, user_hand);
@@ -171,7 +171,7 @@ long Betting(long money) {
     long bet_money;
     int dip_d, clcd_d;
     unsigned char c;
-    char buf[10] = "Betting...";
+    char buf[10] = "\nBetting...";
     if((dip_d = open(dip,O_RDWR)) < 0) {
         perror("open");
         exit(1);
@@ -301,7 +301,7 @@ unsigned char mtn[13][8] = {
                 case '7': write(dot_mtx, &mtn[6], sizeof(mtn[6])); usleep(100000); break;
                 case '8': write(dot_mtx, &mtn[7], sizeof(mtn[7])); usleep(100000); break;
                 case '9': write(dot_mtx, &mtn[8], sizeof(mtn[8])); usleep(100000); break;
-                case '10': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
+                case '0': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
                 case 'J': write(dot_mtx, &mtn[10], sizeof(mtn[10])); usleep(100000); break;
                 case 'Q': write(dot_mtx, &mtn[11], sizeof(mtn[11])); usleep(100000); break;
                 case 'K': write(dot_mtx, &mtn[12], sizeof(mtn[12])); usleep(100000); break;
@@ -320,7 +320,7 @@ unsigned char mtn[13][8] = {
                 case '7': write(dot_mtx, &mtn[6], sizeof(mtn[6])); usleep(100000); break;
                 case '8': write(dot_mtx, &mtn[7], sizeof(mtn[7])); usleep(100000); break;
                 case '9': write(dot_mtx, &mtn[8], sizeof(mtn[8])); usleep(100000); break;
-                case '10': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
+                case '0': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
                 case 'J': write(dot_mtx, &mtn[10], sizeof(mtn[10])); usleep(100000); break;
                 case 'Q': write(dot_mtx, &mtn[11], sizeof(mtn[11])); usleep(100000); break;
                 case 'K': write(dot_mtx, &mtn[12], sizeof(mtn[12])); usleep(100000); break;
@@ -339,7 +339,7 @@ unsigned char mtn[13][8] = {
                 case '7': write(dot_mtx, &mtn[6], sizeof(mtn[6])); usleep(100000); break;
                 case '8': write(dot_mtx, &mtn[7], sizeof(mtn[7])); usleep(100000); break;
                 case '9': write(dot_mtx, &mtn[8], sizeof(mtn[8])); usleep(100000); break;
-                case '10': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
+                case '0': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
                 case 'J': write(dot_mtx, &mtn[10], sizeof(mtn[10])); usleep(100000); break;
                 case 'Q': write(dot_mtx, &mtn[11], sizeof(mtn[11])); usleep(100000); break;
                 case 'K': write(dot_mtx, &mtn[12], sizeof(mtn[12])); usleep(100000); break;
@@ -358,7 +358,7 @@ unsigned char mtn[13][8] = {
                 case '7': write(dot_mtx, &mtn[6], sizeof(mtn[6])); usleep(100000); break;
                 case '8': write(dot_mtx, &mtn[7], sizeof(mtn[7])); usleep(100000); break;
                 case '9': write(dot_mtx, &mtn[8], sizeof(mtn[8])); usleep(100000); break;
-                case '10': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
+                case '': write(dot_mtx, &mtn[9], sizeof(mtn[9])); usleep(100000); break;
                 case 'J': write(dot_mtx, &mtn[10], sizeof(mtn[10])); usleep(100000); break;
                 case 'Q': write(dot_mtx, &mtn[11], sizeof(mtn[11])); usleep(100000); break;
                 case 'K': write(dot_mtx, &mtn[12], sizeof(mtn[12])); usleep(100000); break;
@@ -409,7 +409,7 @@ int FND_control(long money){
     fnd_num[2] = FND_DATA_TBL[money[2]];
     fnd_num[3] = FND_DATA_TBL[money[3]];
 
-    fnd_fd = open(fnd_dev, O_RDWR);
+    fnd_fd = open(fnd, O_RDWR);
 	if(fnd_fd <0){ printf("fnd error\n"); } // 예외처리
 
     write(fnd_fd, &fnd_num, sizeof(fnd_num)); // 출력
@@ -420,8 +420,8 @@ int FND_control(long money){
 
 void DealerCardShow(char shape, char alpha) {
     int clcd_d;
-    char buf[16];
-    char temp[2];
+    unsigned char buf[16];
+    unsigned char temp[2];
 
     strcat(temp, shape);
     strcat(temp, alpha);
@@ -450,7 +450,7 @@ bool HandCheck(char* arr) {
 
 void ResultPrint(int check) {
     int clcd_d;
-    char buf[16] = "";
+    unsigned char buf[16] = "";
     if((clcd_d = open(clcd,O_RDWR)) < 0) {
         perror("open");
         exit(1);
