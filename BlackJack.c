@@ -211,8 +211,8 @@ int FND_control(int user_money[], int time_sleep){
  	// money 배열의 원소들을 순서에 맞게 넣어주기
     fnd_num[0] = FND_DATA_TBL[user_money[0]];
     fnd_num[1] = FND_DATA_TBL[user_money[1]];
-    fnd_num[2] = FND_DATA_TBL[uesr_money[2]];
-    fnd_num[3] = FND_DATA_TBL[uesr_money[3]];
+    fnd_num[2] = FND_DATA_TBL[user_money[2]];
+    fnd_num[3] = FND_DATA_TBL[user_money[3]];
 
     fnd_fd = open(fnd, O_RDWR);
  	if(fnd_fd <0){ printf("fnd error\n"); } // 예외처리
