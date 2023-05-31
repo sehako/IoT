@@ -198,30 +198,30 @@ void adjust_user_money(int money[]){
 	else{ /*pass*/ }
 }
 
-// // 세그먼트 제어 함수
-// int FND_control(int money, int time_sleep){
-// 	unsigned char FND_DATA_TBL[]={
-//         	0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90,0x88,
-//         	0x83,0xC6,0xA1,0x86,0x8E,0xC0,0xF9,0xA4,0xB0,0x99,0x89
-// 	};
+// 세그먼트 제어 함수
+int FND_control(int user_money[], int time_sleep){
+ 	unsigned char FND_DATA_TBL[]={
+        0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90,0x88,
+        0x83,0xC6,0xA1,0x86,0x8E,0xC0,0xF9,0xA4,0xB0,0x99,0x89
+ 	};
 
-// 	int fnd_fd = 0;
-//     unsigned char fnd_num[4];
+ 	int fnd_fd = 0;
+    unsigned char fnd_num[4];
 
-// 	// money 배열의 원소들을 순서에 맞게 넣어주기
-//     fnd_num[0] = FND_DATA_TBL[money[0]];
-//     fnd_num[1] = FND_DATA_TBL[money[1]];
-//     fnd_num[2] = FND_DATA_TBL[money[2]];
-//     fnd_num[3] = FND_DATA_TBL[money[3]];
+ 	// money 배열의 원소들을 순서에 맞게 넣어주기
+    fnd_num[0] = FND_DATA_TBL[user_money[0]];
+    fnd_num[1] = FND_DATA_TBL[user_money[1]];
+    fnd_num[2] = FND_DATA_TBL[uesr_money[2]];
+    fnd_num[3] = FND_DATA_TBL[uesr_money[3]];
 
-//     fnd_fd = open(fnd, O_RDWR);
-// 	if(fnd_fd <0){ printf("fnd error\n"); } // 예외처리
+    fnd_fd = open(fnd, O_RDWR);
+ 	if(fnd_fd <0){ printf("fnd error\n"); } // 예외처리
 
-//     write(fnd_fd, &fnd_num, sizeof(fnd_num)); // 출력
-//     sleep(time_sleep); // 점등시간 조절
+    write(fnd_fd, &fnd_num, sizeof(fnd_num)); // 출력
+    sleep(time_sleep); // 점등시간 조절
 
-//     close(fnd_fd);
-// }
+    close(fnd_fd);
+}
 
 void DealerCardShow(char dealer_hand[10], int hitting) {
     int clcd_d;
@@ -347,6 +347,19 @@ int main(void) {
     fclose(file);
 
     //fnd에 숫자를 띄우기위한 배열저장
+    file = fopen("money.txt", "r");
+
+    char money_str[5];
+    fscanf(file, "%s", money_str);
+    fclose(file);
+
+    int user_money[4] = {0};
+    int moneys = atoi(money_str);
+
+    user_money[0] = moneys / 1000;
+    user_money[1] = (moneys % 1000) / 100;
+    user_money[2] = (moneys % 100) / 10;
+    user_money[3] = moneys % 10;
 
 
     //게임 실행 반복문
