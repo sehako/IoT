@@ -282,9 +282,11 @@ bool HandCheck(char* arr, int *cnt) {
     }
 }
 
-void ResultPrint(int check) {
+void ResultPrint(char hand[10], int check) {
     int clcd_d;
-    unsigned char buf[16] = "";
+    unsigned char buf[32] = "";
+    sprintf(buf, "%s", hand);
+    unsigned char guide[16] = "";
     if((clcd_d = open(clcd,O_RDWR)) < 0) {
         perror("open");
         exit(1);
@@ -292,18 +294,22 @@ void ResultPrint(int check) {
 
     switch(check) {
         case 0:
-        sprintf(buf, "%s", "\nYou Win!");
+        sprintf(guide, "%s", "\nYou Win!");
+        strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         case 1:
-        sprintf(buf, "%s", "\nPush!");
+        sprintf(guide, "%s", "\nPush!");
+        strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         case 2:
-        sprintf(buf, "%s", "\nGame Over!");
+        sprintf(guide, "%s", "\nGame Over!");
+        strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         default:
-        sprintf(buf, "%s", "\nYou Lose!");
+        sprintf(guide, "%s", "\nYou Lose!");
+        strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
     }
@@ -438,22 +444,22 @@ int main(void) {
             //승패 계산
             if (dealer_bust) {
                 //딜러 버스트 부분 LCD 구현
-                ResultPrint(0);
+                ResultPrint(dealer_hand, 0);
                 money += bet_money * 2;
             }
             else if (user_score > dealer_score) {
                 //플레이어 승리 부분 LCD 구현
-                ResultPrint(0);
+                ResultPrint(dealer_hand, 0);
                 money += bet_money * 2;
             }
             else if (user_score == dealer_score) {
                 //무승부 부분 LCD 구현
-                ResultPrint(1);
+                ResultPrint(dealer_hand, 1);
                 money += bet_money;
             }
             else {
                 //패배
-                ResultPrint(3);
+                ResultPrint(dealer_hand, 3);
                 printf("You lose!\n");
             }
         }
