@@ -464,7 +464,7 @@ int main(void) {
             }
         }
         if (money == 0) {
-            ResultPrint(2);
+            ResultPrint(dealer_hand, 2);
             //소지금 전부 소진 시
             Finish(true, money);
             break;

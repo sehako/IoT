@@ -11,22 +11,19 @@ int main()
     int dip_d;
     unsigned char c;
 
-    if((dip_d = open(dip,O_RDWR)) < 0)
-    {
+    if((dip_d = open(dip,O_RDWR)) < 0) {
         perror("open");
         exit(1);
     }
 
-    while(1)
-    {
-        while(1)
-        {
+    while(1) {
+        while(1) {
             read(dip_d,&c,sizeof(c));
+            printf("%d\n",c);
             if(c)
                 break;
         }
 
-        printf("%d\n",c);
         close(dip_d);
         return 0;
     }
