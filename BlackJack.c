@@ -65,26 +65,25 @@ int Betting(int money) {
         perror("open");
         exit(1);
     }
-    read(tactsw, &c, sizeof(c));
-    close(tactsw);
+    while(true) {
+        read(tactsw, &c, sizeof(c));
+        close(tactsw);
 
-    switch(c) {
-    case 0:
-    case 1:
-    bet_money += 100;
-    FND_control(bet_money);
-    break;
-    case 2:
-    bet_money += 200;
-    FND_control(bet_money);
-    break;
-    case 3:
-    bet_money += 500;
-    FND_control(bet_money);
-    break;
+        switch(c) {
+        case 1:
+        bet_money += 100;
+        FND_control(bet_money);
+        break;
+        case 2:
+        bet_money += 200;
+        FND_control(bet_money);
+        break;
+        case 3:
+        bet_money += 500;
+        FND_control(bet_money);
+        break;
+        }
     }
-
-
     close(tactsw);
     return bet_money;
 }
@@ -360,7 +359,7 @@ int main(void) {
         //초기금액 3초간 표시
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
-        // bet_money = Betting(money);
+        bet_money = Betting(money);
         money -= bet_money;
 
         //행 부분은 카드 문양 열 부분은 카드 값
@@ -404,7 +403,6 @@ int main(void) {
         }
         else {
             while (true) {
-                
                 //힛 or 스탠드 구현
                 if (user_score > 21) {
                     if (HandCheck(user_hand, &user_ace_count)) user_score -= 10;
