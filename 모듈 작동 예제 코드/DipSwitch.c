@@ -19,7 +19,9 @@ int main()
     while(1) {
         while(1) {
             read(dip_d,&c,sizeof(c));
-            printf("%d\n",c);
+            if(c != 0) {
+                printf("%d\n",c);
+            }
             if(c)
                 break;
         }
