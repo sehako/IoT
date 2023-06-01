@@ -26,17 +26,10 @@ int FND_control(int user_money){
     money[2] = (user_money % 100) / 10;
     money[3] = user_money % 10;
 
-    if(money[0] == 0) {
-        fnd_num[1] = FND_DATA_TBL[money[1]];
-        fnd_num[2] = FND_DATA_TBL[money[2]];
-        fnd_num[3] = FND_DATA_TBL[money[3]];
-    }
-    else {
-        fnd_num[0] = FND_DATA_TBL[money[0]];
-        fnd_num[1] = FND_DATA_TBL[money[1]];
-        fnd_num[2] = FND_DATA_TBL[money[2]];
-        fnd_num[3] = FND_DATA_TBL[money[3]];
-    }
+    fnd_num[0] = FND_DATA_TBL[money[0]];
+    fnd_num[1] = FND_DATA_TBL[money[1]];
+    fnd_num[2] = FND_DATA_TBL[money[2]];
+    fnd_num[3] = FND_DATA_TBL[money[3]];
  	// money 배열의 원소들을 순서에 맞게 넣어주기
 
     fnd_fd = open(fnd, O_RDWR);
