@@ -202,23 +202,23 @@ void CardShow(char shape, char alpha) {
     switch (shape) {
         case 'S':
             write(dot_mtx, &mtx[1], sizeof(mtx[1])); //스페이드 출력
-            usleep(3000000); //1초동안 점등
-            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(300000);
+            usleep(3000000); //3초동안 점등
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(3000000);
             break;
         case 'C':
             write(dot_mtx, &mtx[2], sizeof(mtx[2])); //클로버 출력
-            usleep(3000000); //1초동안 점등
-            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(300000);
+            usleep(3000000); //3초동안 점등
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(3000000);
             break;
         case 'D':
             write(dot_mtx, &mtx[3], sizeof(mtx[3])); //다이아몬드 출력
-            usleep(3000000); //1초동안 점등
-            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(300000);
+            usleep(3000000); //3초동안 점등
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(3000000);
             break;
         default:
             write(dot_mtx, &mtx[0], sizeof(mtx[0])); //하트 출력
-            usleep(3000000); //1초동안 점등
-            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(300000);
+            usleep(3000000); //3초동안 점등
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(3000000);
             break;
     }
     close(dot_mtx);
@@ -454,6 +454,7 @@ int main(void) {
         DealerCardShow(dealer_hand, 0);
         sleep(2);        
         CardShow(shape, alpha);
+        sleep(2);
 
         //두 번째 카드 분배
         user_score += Draw(&shape, &alpha, deck, user_hand);
