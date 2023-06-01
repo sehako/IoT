@@ -16,11 +16,11 @@
 
 // 세그먼트 제어 함수
 int FND_control(int user_money){
-    int money[4] = {0, 0, 0, 0};
  	unsigned char FND_DATA_TBL[]={~0x3f,~0x06,~0x5b,~0x4f,~0x66,~0x6d,~0x7d,~0x07,~0x7f,~0x67,~0x00};
 
  	int fnd_fd = 0;
     unsigned char fnd_num[4];
+    int money[4] = {0, 0, 0, 0};
     money[0] = user_money / 1000;
     money[1] = (user_money % 1000) / 100;
     money[2] = (user_money % 100) / 10;
@@ -45,7 +45,7 @@ int Betting(int money) {
     int dip_d;
     int clcd_d;
     int bet_money = 0;
-    char guide[16] = "";
+    char guide[32] = "";
     unsigned char c;
 
     if((dip_d = open(dip,O_RDWR)) < 0) {
@@ -65,15 +65,12 @@ int Betting(int money) {
             switch(c) {
                 //100원
                 case 1: bet_money += 100; 
-                FND_control(bet_money);
                 continue;
                 //500원
                 case 2: bet_money += 200; 
-                FND_control(bet_money); 
                 continue;
                 //1000원
                 case 3: bet_money += 500; 
-                FND_control(bet_money);
                 continue;
                 case 7: 
                 break;
@@ -383,7 +380,6 @@ int main(void) {
 
         //초기금액 3초간 표시
         FND_control(money);
-        sleep(3);
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
         Betting(money);
