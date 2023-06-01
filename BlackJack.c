@@ -45,43 +45,43 @@ int FND_control(int money){
 }
 
 
-int Betting(int money) {
-    int tactsw;
-    // int clcd_d;
-    int bet_money = 0;
-    char guide[32] = "";
-    unsigned char c;
+// int Betting(int money) {
+//     int tactsw;
+//     // int clcd_d;
+//     int bet_money = 0;
+//     char guide[32] = "";
+//     unsigned char c;
 
-    // if((clcd_d = open(clcd,O_RDWR)) < 0) {
-    //     perror("open");
-    //     exit(1);
-    // }
+//     // if((clcd_d = open(clcd,O_RDWR)) < 0) {
+//     //     perror("open");
+//     //     exit(1);
+//     // }
 
-    // sprintf(guide, "%s", "Betting...");
-    // write(clcd_d, &guide, strlen(guide));
-    // close(clcd_d);
+//     // sprintf(guide, "%s", "Betting...");
+//     // write(clcd_d, &guide, strlen(guide));
+//     // close(clcd_d);
 
-    if((tactsw = open(tact,O_RDWR)) < 0) {
-        perror("open");
-        exit(1);
-    }
-    switch(c) {
-    case 0:
-    case 1:
-    bet_money += 100;
-    break;
-    case 2:
-    bet_money += 200;
-    break;
-    case 3:
-    bet_money += 500;
-    break;
-    }
+//     if((tactsw = open(tact,O_RDWR)) < 0) {
+//         perror("open");
+//         exit(1);
+//     }
+//     switch(c) {
+//     case 0:
+//     case 1:
+//     bet_money += 100;
+//     break;
+//     case 2:
+//     bet_money += 200;
+//     break;
+//     case 3:
+//     bet_money += 500;
+//     break;
+//     }
 
 
-    close(tactsw);
-    return bet_money;
-}
+//     close(tactsw);
+//     return bet_money;
+// }
 
 int Alpha_dot(char alphabet) {
     int alpha_pos = 0;
@@ -363,7 +363,7 @@ int main(void) {
         //초기금액 3초간 표시
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
-        bet_money = Betting(money);
+        // bet_money = Betting(money);
         money -= bet_money;
 
         //행 부분은 카드 문양 열 부분은 카드 값
