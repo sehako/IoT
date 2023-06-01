@@ -8,9 +8,10 @@
 #include <asm/ioctls.h>
 #include <time.h>
 #include <stdbool.h>
+#include<sys/stat.h> 
 
 #define clcd "/dev/clcd"
-#define dip "/dev/dipsw"
+#define tact "/dev/tactsw"
 #define dot "/dev/dot"
 #define fnd "/dev/fnd"
 
@@ -45,13 +46,13 @@ int FND_control(int money){
 
 
 int Betting(int money) {
-    int dip_d;
+    int tactsw;
     int clcd_d;
     int bet_money = 0;
     char guide[32] = "";
     unsigned char c;
 
-    if((dip_d = open(dip,O_RDWR)) < 0) {
+    if((tactsw = open(tact,O_RDWR)) < 0) {
         perror("open");
         exit(1);
     }
@@ -83,7 +84,7 @@ int Betting(int money) {
     }
 
 
-    close(dip_d);
+    close(tactsw);
     return bet_money;
 }
 
