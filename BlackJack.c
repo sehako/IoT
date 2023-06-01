@@ -15,11 +15,18 @@
 #define fnd "/dev/fnd"
 
 // 세그먼트 제어 함수
-int FND_control(int user_money[4]){
+int FND_control(int money){
  	unsigned char FND_DATA_TBL[]={~0x3f,~0x06,~0x5b,~0x4f,~0x66,~0x6d,~0x7d,~0x07,~0x7f,~0x67,~0x00};
 
  	int fnd_fd = 0;
     unsigned char fnd_num[4];
+
+    int user_money[4] = {0, 0, 0, 0};
+
+    user_money[0] = money / 1000;
+    user_money[1] = (money % 1000) / 100;
+    user_money[2] = (money % 100) / 10;
+    user_money[3] = money % 10;
 
     fnd_num[0] = FND_DATA_TBL[user_money[0]];
     fnd_num[1] = FND_DATA_TBL[user_money[1]];
@@ -56,6 +63,7 @@ int Betting(int money) {
 
     sprintf(guide, "%s", "\nBetting...");
     write(clcd_d, &guide, strlen(guide));
+    close(clcd_d);
     while(true) {
         if(money > bet_money) {
             switch(c) {
@@ -80,7 +88,6 @@ int Betting(int money) {
         } 
     }
     close(dip_d);
-    close(clcd_d);
     return bet_money;
 }
 
@@ -348,7 +355,6 @@ void Finish(bool over, int num) {
 }
 
 int main(void) {
-    int user_money[4] = {0, 0, 0, 0};
     int money = 0;
     int bet_money = 0;
     bool user_busted = false;
@@ -360,11 +366,7 @@ int main(void) {
     fscanf(file, "%d", &money);
     if(money > 9999) money = 9999;
     fclose(file);
-    user_money[0] = money / 1000;
-    user_money[1] = (money % 1000) / 100;
-    user_money[2] = (money % 100) / 10;
-    user_money[3] = money % 10;
-    FND_control(user_money);
+    FND_control(money);
 
     //게임 실행 반복문
     while (true) {
