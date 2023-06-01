@@ -49,17 +49,17 @@ int Betting(int money) {
     int tactsw;
     int clcd_d;
     int bet_money = 0;
-    char guide[32] = "";
+    // char guide[32] = "";
     unsigned char c;
 
-    if((clcd_d = open(clcd,O_RDWR)) < 0) {
-        perror("open");
-        exit(1);
-    }
+    // if((clcd_d = open(clcd,O_RDWR)) < 0) {
+    //     perror("open");
+    //     exit(1);
+    // }
 
-    sprintf(guide, "%s", "Betting...");
-    write(clcd_d, &guide, strlen(guide));
-    close(clcd_d);
+    // sprintf(guide, "%s", "Betting...");
+    // write(clcd_d, &guide, strlen(guide));
+    // close(clcd_d);
 
     if((tactsw = open(tact,O_RDWR)) < 0) {
         perror("open");
@@ -82,7 +82,6 @@ int Betting(int money) {
     FND_control(bet_money);
     break;
     }
-    close(tactsw);
     return bet_money;
 }
 
@@ -238,20 +237,22 @@ void DealerCardShow(char dealer_hand[10], int hitting) {
         sprintf(guide, "%s", "Card Drawing");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
+        close(clcd_d);
         break;
         case 1:
         sprintf(guide, "%s", "Hit or Stand");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
+        close(clcd_d);
         break;
         default:
         sprintf(buf, "%s", dealer_hand);
         sprintf(guide, "%s", "Result...");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
+        close(clcd_d);
         break;
     }
-    close(clcd_d);
 }
 
 bool HandCheck(char* arr, int *cnt) {
