@@ -15,21 +15,16 @@
 #define fnd "/dev/fnd"
 
 // 세그먼트 제어 함수
-int FND_control(int user_money){
+int FND_control(int user_money[4]){
  	unsigned char FND_DATA_TBL[]={~0x3f,~0x06,~0x5b,~0x4f,~0x66,~0x6d,~0x7d,~0x07,~0x7f,~0x67,~0x00};
 
  	int fnd_fd = 0;
     unsigned char fnd_num[4];
-    int money[4] = {0, 0, 0, 0};
-    money[0] = user_money / 1000;
-    money[1] = (user_money % 1000) / 100;
-    money[2] = (user_money % 100) / 10;
-    money[3] = user_money % 10;
 
-    fnd_num[0] = FND_DATA_TBL[money[0]];
-    fnd_num[1] = FND_DATA_TBL[money[1]];
-    fnd_num[2] = FND_DATA_TBL[money[2]];
-    fnd_num[3] = FND_DATA_TBL[money[3]];
+    fnd_num[0] = FND_DATA_TBL[user_money[0]];
+    fnd_num[1] = FND_DATA_TBL[user_money[1]];
+    fnd_num[2] = FND_DATA_TBL[user_money[2]];
+    fnd_num[3] = FND_DATA_TBL[user_money[3]];
  	// money 배열의 원소들을 순서에 맞게 넣어주기
 
     fnd_fd = open(fnd, O_RDWR);
@@ -352,6 +347,7 @@ void Finish(bool over, int num) {
 }
 
 int main(void) {
+    int user_money[4] = {0, 0, 0, 0};
     int money = 0;
     int bet_money = 0;
     bool user_busted = false;
@@ -363,6 +359,10 @@ int main(void) {
     fscanf(file, "%d", &money);
     if(money > 9999) money = 9999;
     fclose(file);
+    user_money[0] = money / 1000;
+    user_money[1] = (money % 1000) / 100;
+    user_money[2] = (money % 100) / 10;
+    user_money[3] = money % 10;
 
 
     //게임 실행 반복문
@@ -379,7 +379,7 @@ int main(void) {
         if(money > 9999) money = 9999;
 
         //초기금액 3초간 표시
-        FND_control(money);
+        FND_control(user_money);
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
         Betting(money);
