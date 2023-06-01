@@ -15,7 +15,8 @@
 #define fnd "/dev/fnd"
 
 // 세그먼트 제어 함수
-int FND_control(int user_money[], int time_sleep){
+int FND_control(int user_money){
+    int money[4] = {0, 0, 0, 0};
  	unsigned char FND_DATA_TBL[]={
         0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90,0x88,
         0x83,0xC6,0xA1,0x86,0x8E,0xC0,0xF9,0xA4,0xB0,0x99,0x89
@@ -23,12 +24,23 @@ int FND_control(int user_money[], int time_sleep){
 
  	int fnd_fd = 0;
     unsigned char fnd_num[4];
+    money[0] = user_money / 1000;
+    money[1] = (user_money % 1000) / 100;
+    money[2] = (user_money % 100) / 10;
+    money[3] = user_money % 10;
 
+    if(money[0] == 0) {
+        fnd_num[1] = FND_DATA_TBL[money[1]];
+        fnd_num[2] = FND_DATA_TBL[money[2]];
+        fnd_num[3] = FND_DATA_TBL[money[3]];
+    }
+    else {
+        fnd_num[0] = FND_DATA_TBL[money[0]];
+        fnd_num[1] = FND_DATA_TBL[money[1]];
+        fnd_num[2] = FND_DATA_TBL[money[2]];
+        fnd_num[3] = FND_DATA_TBL[money[3]];
+    }
  	// money 배열의 원소들을 순서에 맞게 넣어주기
-    fnd_num[0] = FND_DATA_TBL[user_money[0]];
-    fnd_num[1] = FND_DATA_TBL[user_money[1]];
-    fnd_num[2] = FND_DATA_TBL[user_money[2]];
-    fnd_num[3] = FND_DATA_TBL[user_money[3]];
 
     fnd_fd = open(fnd, O_RDWR);
  	if(fnd_fd <0){ printf("fnd error\n"); } // 예외처리
@@ -63,14 +75,20 @@ int Betting(int money) {
             switch(c) {
                 //100원
                 case 1: bet_money += 100; 
-                
+                FND_control(bet_money);
                 continue;
                 //500원
-                case 2: bet_money += 200; continue;
+                case 2: bet_money += 200; 
+                FND_control(bet_money); 
+                continue;
                 //1000원
-                case 3: bet_money += 500; continue;
-                case 7: break;
-                default: continue;
+                case 3: bet_money += 500; 
+                FND_control(bet_money);
+                continue;
+                case 7: 
+                break;
+                default: 
+                continue;
             }
             break;
         }
@@ -349,7 +367,6 @@ void Finish(bool over, int num) {
 int main(void) {
     int money = 0;
     int bet_money = 0;
-    int user_money[4];
     bool user_busted = false;
     char alpha, dealer_alpha, shape, dealer_shape;
     FILE* file;
@@ -359,11 +376,7 @@ int main(void) {
     fscanf(file, "%d", &money);
     if(money > 9999) money = 9999;
     fclose(file);
-    
-    user_money[0] = money / 1000;
-    user_money[1] = (money % 1000) / 100;
-    user_money[2] = (money % 100) / 10;
-    user_money[3] = money % 10;
+
 
     //게임 실행 반복문
     while (true) {
@@ -379,7 +392,8 @@ int main(void) {
         if(money > 9999) money = 9999;
 
         //초기금액 3초간 표시
-        FND_control(user_money,3);
+        FND_control(money);
+        sleep(3);
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
         Betting(money);
