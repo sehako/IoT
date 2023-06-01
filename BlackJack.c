@@ -23,31 +23,30 @@ int Betting(int money) {
     }
 
     while(true) {
-        while(true) {
-            if(true) {
-                // switch(c) {
-                //     //100원
-                //     case ' ':
-                //     bet_money += 100;
-                //     continue;
-                //     //500원
-                //     case ' ':
-                //     bet_money += 500;
-                //     continue;
-                //     //1000원
-                //     case ' ':
-                //     bet_money += 1000;
-                //     continue;
-                //     case ' ':
-                //     break;
-                //     default:
-                //     continue;
-                // }
+        if(true) {
+            switch(c) {
+                //100원
+                case 1:
+                bet_money += 100;
+                continue;
+                //500원
+                case 2:
+                bet_money += 200;
+                continue;
+                //1000원
+                case 3:
+                bet_money += 500;
+                continue;
+                case 7:
+                break;
+                default:
+                continue;
             }
+            break;
         }
-        close(dip_d);
-        return bet_money;
     }
+    close(dip_d);
+    return bet_money;
 }
 
 int Alpha_dot(char alphabet) {
@@ -307,6 +306,10 @@ void ResultPrint(char hand[10], int check) {
         sprintf(guide, "%s", "\nGame Over!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
+        case 3:
+        sprintf(guide, "%s", "\nBlackJack!");
+        strcat(buf, guide);
+        write(clcd_d, &buf, strlen(buf));
         default:
         sprintf(guide, "%s", "\nYou Lose!");
         strcat(buf, guide);
@@ -328,6 +331,7 @@ void Finish(bool over, int num) {
         printf("GameOver!\n");
     }
     else {
+        if(num > 9999) num = 9999;
         fprintf(file, "%ld", num);
         printf("GameFinished\n");
     }
@@ -417,7 +421,7 @@ int main(void) {
         }
 
         if (user_score == 21) {
-            //블랙잭 구현 부분
+            ResultPrint(dealer_hand, 3);
             money += bet_money * 2;
             continue;
         }
