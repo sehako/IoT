@@ -83,26 +83,6 @@ int FND_control(int money){
 //     return bet_money;
 // }
 
-int Alpha_dot(char alphabet) {
-    int alpha_pos = 0;
-    switch (alphabet) {
-    case 'A': alpha_pos = 0; break;
-    case '2': alpha_pos = 1; break;
-    case '3': alpha_pos = 2; break;
-    case '4': alpha_pos = 3; break;
-    case '5': alpha_pos = 4; break;
-    case '6': alpha_pos = 5; break;
-    case '7': alpha_pos = 6; break;
-    case '8': alpha_pos = 7; break;
-    case '9': alpha_pos = 8; break;
-    case '0': alpha_pos = 9; break;
-    case 'J': alpha_pos = 10; break;
-    case 'Q': alpha_pos = 11; break;
-    case 'K': alpha_pos = 12; break;
-    }
-    return alpha_pos;
-}
-
 //덱 드로우 함수
 int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
     int value = 0;
@@ -159,6 +139,27 @@ int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
     return value;
 }
 
+int Alpha_dot(char alphabet) {
+    int alpha_pos = 0;
+    switch (alphabet) {
+    case 'A': alpha_pos = 0; break;
+    case '2': alpha_pos = 1; break;
+    case '3': alpha_pos = 2; break;
+    case '4': alpha_pos = 3; break;
+    case '5': alpha_pos = 4; break;
+    case '6': alpha_pos = 5; break;
+    case '7': alpha_pos = 6; break;
+    case '8': alpha_pos = 7; break;
+    case '9': alpha_pos = 8; break;
+    case '0': alpha_pos = 9; break;
+    case 'J': alpha_pos = 10; break;
+    case 'Q': alpha_pos = 11; break;
+    case 'K': alpha_pos = 12; break;
+    }
+    return alpha_pos;
+}
+
+
 //Dot Matrix로 유저의 카드 출력 구현
 void CardShow(char shape, char alpha) {
     //dot_matrix에 띄울 문양
@@ -191,28 +192,28 @@ void CardShow(char shape, char alpha) {
         printf("Can't Open\n");
         exit(0);
     }
-
+    int pos = Alpha_dot(alpha);
     //모양에 따라 dot matrix 출력
     switch (shape) {
         case 'S':
             write(dot_mtx, &mtx[1], sizeof(mtx[1])); //스페이드 출력
             usleep(3000000); //1초동안 점등
-            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(300000);
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(300000);
             break;
         case 'C':
             write(dot_mtx, &mtx[2], sizeof(mtx[2])); //클로버 출력
             usleep(3000000); //1초동안 점등
-            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(300000);
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(300000);
             break;
         case 'D':
             write(dot_mtx, &mtx[3], sizeof(mtx[3])); //다이아몬드 출력
             usleep(3000000); //1초동안 점등
-            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(300000);
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(300000);
             break;
         default:
             write(dot_mtx, &mtx[0], sizeof(mtx[0])); //하트 출력
             usleep(3000000); //1초동안 점등
-            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(300000);
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(300000);
             break;
     }
     close(dot_mtx);
@@ -222,37 +223,28 @@ void DealerCardShow(char dealer_hand[10], int hitting) {
     int clcd_d;
     unsigned char buf[32];
     unsigned char guide[16];
-    unsigned char temp[2];
     int i;
 
     if((clcd_d = open(clcd,O_RDWR)) < 0){
         perror("open");
         exit(1);
     }
-    
+    sprintf(buf, "%s", dealer_hand);
     sprintf(buf, "%s", dealer_hand);
     switch(hitting) {
         case 0:
-        for(i = 0; i < 2; i++) {
-        temp[i] = dealer_hand[i];
-        }
-        sprintf(buf, "%s", temp);
-        sprintf(guide, "%s", "Card Drawing");
+        sprintf(guide, "%s", "      Card Drawing");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         case 1:
-        for(i = 0; i < 2; i++) {
-        temp[i] = dealer_hand[i];
-        }
-        sprintf(buf, "%s", temp);
-        sprintf(guide, "%s", "Hit or Stand");
+        sprintf(guide, "%s", "      Hit or Stand");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         default:
         sprintf(buf, "%s", dealer_hand);
-        sprintf(guide, "%s", "Result...");
+        sprintf(guide, "%s", "      Result...");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
@@ -289,25 +281,25 @@ void ResultPrint(char hand[10], int check) {
 
     switch(check) {
         case 0:
-        sprintf(guide, "%s", "\nYou Win!");
+        sprintf(guide, "%s", "      You Win!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         case 1:
-        sprintf(guide, "%s", "\nPush!");
+        sprintf(guide, "%s", "      Push!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         case 2:
-        sprintf(guide, "%s", "\nGame Over!");
+        sprintf(guide, "%s", "      Game Over!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         case 3:
-        sprintf(guide, "%s", "\nBlackJack!");
+        sprintf(guide, "%s", "      BlackJack!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         default:
-        sprintf(guide, "%s", "\nYou Lose!");
+        sprintf(guide, "%s", "     You Lose!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
@@ -377,6 +369,8 @@ int main(void) {
         //첫 번째 카드 분배
         user_score += Draw(&shape, &alpha, deck, user_hand);
         dealer_score += Draw(&dealer_shape, &dealer_alpha, deck, dealer_hand);
+        printf("%c %c", shape, alpha);
+        printf("%c %c", shape, alpha);
 
 
         //첫 번째 카드 출력(딜러는 LCD, 플레이어는 Dot Matrix)
