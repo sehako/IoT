@@ -17,7 +17,9 @@
 
 int Betting(int money) {
     int dip_d;
+    int clcd_d;
     int bet_money = 0;
+    char guide[16] = "";
     unsigned char c;
 
     if((dip_d = open(dip,O_RDWR)) < 0) {
@@ -25,8 +27,15 @@ int Betting(int money) {
         exit(1);
     }
 
+    if((clcd_d = open(clcd,O_RDWR)) < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    sprintf(guide, "%s", "\nBetting...");
+    write(clcd_d, &guide, strlen(guide));
     while(true) {
-        if(true) {
+        if(money > bet_money) {
             switch(c) {
                 //100원
                 case 1: bet_money += 100; continue;
@@ -39,8 +48,12 @@ int Betting(int money) {
             }
             break;
         }
+        else {
+        bet_money = money;
+        } 
     }
     close(dip_d);
+    close(clcd_d);
     return bet_money;
 }
 
@@ -368,7 +381,7 @@ int main(void) {
         FND_control(user_money,3);
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
-        // bet_money = Betting(money);
+        Betting(money);
         money -= bet_money;
 
         //행 부분은 카드 문양 열 부분은 카드 값
@@ -377,8 +390,7 @@ int main(void) {
             {'A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'K', 'J'},
             {'A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'K', 'J'},
             {'A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'K', 'J'} };
-        
-        Betting(money);
+    
 
         //첫 번째 카드 분배
         user_score += Draw(&shape, &alpha, deck, user_hand);
