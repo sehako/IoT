@@ -31,6 +31,7 @@ int FND_control(int user_money[4]){
  	if(fnd_fd <0){ printf("fnd error\n"); } // 예외처리
 
     write(fnd_fd, &fnd_num, sizeof(fnd_num)); // 출력
+    sleep(3);
 
     close(fnd_fd);
 }
@@ -363,7 +364,7 @@ int main(void) {
     user_money[1] = (money % 1000) / 100;
     user_money[2] = (money % 100) / 10;
     user_money[3] = money % 10;
-
+    FND_control(user_money);
 
     //게임 실행 반복문
     while (true) {
@@ -379,7 +380,6 @@ int main(void) {
         if(money > 9999) money = 9999;
 
         //초기금액 3초간 표시
-        FND_control(user_money);
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
         Betting(money);
