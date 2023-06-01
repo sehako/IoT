@@ -51,12 +51,7 @@ int Betting(int money) {
     int bet_money = 0;
     char guide[32] = "";
     unsigned char c;
-
-    if((tactsw = open(tact,O_RDWR)) < 0) {
-        perror("open");
-        exit(1);
-    }
-
+    
     if((clcd_d = open(clcd,O_RDWR)) < 0) {
         perror("open");
         exit(1);
@@ -65,22 +60,25 @@ int Betting(int money) {
     sprintf(guide, "%s", "Betting...");
     write(clcd_d, &guide, strlen(guide));
     close(clcd_d);
-    while(true) {
-        switch(c) {
-        case 0:
-        case 1:
-        bet_money += 100;
-        FND_control(bet_money);
-        break;
-        case 2:
-        bet_money += 200;
-        FND_control(bet_money);
-        break;
-        case 3:
-        bet_money += 500;
-        FND_control(bet_money);
-        break;
-        }
+
+    if((tactsw = open(tact,O_RDWR)) < 0) {
+        perror("open");
+        exit(1);
+    }
+    switch(c) {
+    case 0:
+    case 1:
+    bet_money += 100;
+    FND_control(bet_money);
+    break;
+    case 2:
+    bet_money += 200;
+    FND_control(bet_money);
+    break;
+    case 3:
+    bet_money += 500;
+    FND_control(bet_money);
+    break;
     }
 
 
