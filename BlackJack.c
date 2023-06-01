@@ -47,19 +47,19 @@ int FND_control(int money){
 
 int Betting(int money) {
     int tactsw;
-    int clcd_d;
+    // int clcd_d;
     int bet_money = 0;
     char guide[32] = "";
     unsigned char c;
-    
-    if((clcd_d = open(clcd,O_RDWR)) < 0) {
-        perror("open");
-        exit(1);
-    }
 
-    sprintf(guide, "%s", "Betting...");
-    write(clcd_d, &guide, strlen(guide));
-    close(clcd_d);
+    // if((clcd_d = open(clcd,O_RDWR)) < 0) {
+    //     perror("open");
+    //     exit(1);
+    // }
+
+    // sprintf(guide, "%s", "Betting...");
+    // write(clcd_d, &guide, strlen(guide));
+    // close(clcd_d);
 
     if((tactsw = open(tact,O_RDWR)) < 0) {
         perror("open");
@@ -69,15 +69,12 @@ int Betting(int money) {
     case 0:
     case 1:
     bet_money += 100;
-    FND_control(bet_money);
     break;
     case 2:
     bet_money += 200;
-    FND_control(bet_money);
     break;
     case 3:
     bet_money += 500;
-    FND_control(bet_money);
     break;
     }
 
