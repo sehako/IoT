@@ -15,9 +15,9 @@ int main()
     exit(1);
     }
     
-    while(1) {
+    while(c == 0) {
         read(tactsw, &c, sizeof(c));
-        printf("%c %d", c, c);
-        close(tactsw);
     }
+    printf("%c %d", c, c);
+    close(tactsw);
 }
