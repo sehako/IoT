@@ -64,13 +64,18 @@ int Betting(int money) {
     sprintf(guide, "%s", "\nBetting...");
     write(clcd_d, &guide, strlen(guide));
     close(clcd_d);
-    while(true) {
-        if(c == 1) {
-            bet_money += 100;
-            FND_control(bet_money);
-        }
-        else break;
+    switch(c) {
+    case 1:
+    bet_money += 100;
+    break;
+    case 2:
+    bet_money += 200;
+    break;
+    case 3:
+    bet_money += 500;
+    break;
     }
+
     close(dip_d);
     return bet_money;
 }
