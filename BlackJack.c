@@ -45,43 +45,49 @@ int FND_control(int money){
 }
 
 
-// int Betting(int money) {
-//     int tactsw;
-//     // int clcd_d;
-//     int bet_money = 0;
-//     char guide[32] = "";
-//     unsigned char c;
+int Betting(int money) {
+    int tactsw;
+    int clcd_d;
+    int bet_money = 0;
+    char guide[32] = "";
+    unsigned char c;
 
-//     // if((clcd_d = open(clcd,O_RDWR)) < 0) {
-//     //     perror("open");
-//     //     exit(1);
-//     // }
+    if((clcd_d = open(clcd,O_RDWR)) < 0) {
+        perror("open");
+        exit(1);
+    }
 
-//     // sprintf(guide, "%s", "Betting...");
-//     // write(clcd_d, &guide, strlen(guide));
-//     // close(clcd_d);
+    sprintf(guide, "%s", "Betting...");
+    write(clcd_d, &guide, strlen(guide));
+    close(clcd_d);
 
-//     if((tactsw = open(tact,O_RDWR)) < 0) {
-//         perror("open");
-//         exit(1);
-//     }
-//     switch(c) {
-//     case 0:
-//     case 1:
-//     bet_money += 100;
-//     break;
-//     case 2:
-//     bet_money += 200;
-//     break;
-//     case 3:
-//     bet_money += 500;
-//     break;
-//     }
+    if((tactsw = open(tact,O_RDWR)) < 0) {
+        perror("open");
+        exit(1);
+    }
+    read(tactsw, &c, sizeof(c));
+    close(tactsw);
+
+    switch(c) {
+    case 0:
+    case 1:
+    bet_money += 100;
+    FND_control(bet_money);
+    break;
+    case 2:
+    bet_money += 200;
+    FND_control(bet_money);
+    break;
+    case 3:
+    bet_money += 500;
+    FND_control(bet_money);
+    break;
+    }
 
 
-//     close(tactsw);
-//     return bet_money;
-// }
+    close(tactsw);
+    return bet_money;
+}
 
 //덱 드로우 함수
 int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
@@ -230,7 +236,6 @@ void DealerCardShow(char dealer_hand[10], int hitting) {
         exit(1);
     }
     sprintf(buf, "%s", dealer_hand);
-    sprintf(buf, "%s", dealer_hand);
     switch(hitting) {
         case 0:
         sprintf(guide, "%s", "      Card Drawing");
@@ -369,8 +374,6 @@ int main(void) {
         //첫 번째 카드 분배
         user_score += Draw(&shape, &alpha, deck, user_hand);
         dealer_score += Draw(&dealer_shape, &dealer_alpha, deck, dealer_hand);
-        printf("%c %c", shape, alpha);
-        printf("%c %c", shape, alpha);
 
 
         //첫 번째 카드 출력(딜러는 LCD, 플레이어는 Dot Matrix)
