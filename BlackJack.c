@@ -61,20 +61,27 @@ int Betting(int money) {
         exit(1);
     }
 
-    sprintf(guide, "%s", "\nBetting...");
+    sprintf(guide, "%s", "Betting...");
     write(clcd_d, &guide, strlen(guide));
     close(clcd_d);
-    switch(c) {
-    case 1:
-    bet_money += 100;
-    break;
-    case 2:
-    bet_money += 200;
-    break;
-    case 3:
-    bet_money += 500;
-    break;
+    while(true) {
+        switch(c) {
+        case 0:
+        case 1:
+        bet_money += 100;
+        FND_control(bet_money);
+        break;
+        case 2:
+        bet_money += 200;
+        FND_control(bet_money);
+        break;
+        case 3:
+        bet_money += 500;
+        FND_control(bet_money);
+        break;
+        }
     }
+
 
     close(dip_d);
     return bet_money;
@@ -193,39 +200,26 @@ void CardShow(char shape, char alpha) {
     switch (shape) {
         case 'S':
             write(dot_mtx, &mtx[1], sizeof(mtx[1])); //스페이드 출력
-            usleep(1000000); //1초동안 점등
-            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(100000);
+            usleep(3000000); //1초동안 점등
+            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(300000);
             break;
         case 'C':
             write(dot_mtx, &mtx[2], sizeof(mtx[2])); //클로버 출력
-            usleep(1000000); //1초동안 점등
-            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(100000);
+            usleep(3000000); //1초동안 점등
+            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(300000);
             break;
         case 'D':
             write(dot_mtx, &mtx[3], sizeof(mtx[3])); //다이아몬드 출력
-            usleep(1000000); //1초동안 점등
-            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(100000);
+            usleep(3000000); //1초동안 점등
+            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(300000);
             break;
         default:
             write(dot_mtx, &mtx[0], sizeof(mtx[0])); //하트 출력
-            usleep(1000000); //1초동안 점등
-            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(100000);
+            usleep(3000000); //1초동안 점등
+            write(dot_mtx, &mtn[0], sizeof(mtn[alpha_dot(alpha)])); usleep(300000);
             break;
     }
     close(dot_mtx);
-}
-
-// fnd에 한 자리수의 양수로 출력할 수 있도록, user_money 배열 조정해주는 함수
-void adjust_user_money(int money[]){
-	if (money[1] >= 10) {  // 100의 자리수가 10보다 커질때
-		money[0]++; // 1000의 자리수 올려주기
-		money[1] %= 10; // 나머지값을 100의 자릿수에 대입
-	}
-	else if (money[1] < 0) { // 100의 자리수가 0보다 작아질때
-		money[0]--; // 1000의 자릿수 내려주기
-		money[1] = (10 + money[1]); // 100의 자릿수 조정
-	}
-	else{ /*pass*/ }
 }
 
 void DealerCardShow(char dealer_hand[10], int hitting) {
@@ -247,7 +241,7 @@ void DealerCardShow(char dealer_hand[10], int hitting) {
         temp[i] = dealer_hand[i];
         }
         sprintf(buf, "%s", temp);
-        sprintf(guide, "%s", "\nCard Drawing");
+        sprintf(guide, "%s", "Card Drawing");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
@@ -256,13 +250,13 @@ void DealerCardShow(char dealer_hand[10], int hitting) {
         temp[i] = dealer_hand[i];
         }
         sprintf(buf, "%s", temp);
-        sprintf(guide, "%s", "\nHit or Stand");
+        sprintf(guide, "%s", "Hit or Stand");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         default:
         sprintf(buf, "%s", dealer_hand);
-        sprintf(guide, "%s", "\nResult...");
+        sprintf(guide, "%s", "Result...");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
@@ -355,7 +349,6 @@ int main(void) {
     fscanf(file, "%d", &money);
     if(money > 9999) money = 9999;
     fclose(file);
-    FND_control(money);
 
     //게임 실행 반복문
     while (true) {
@@ -370,6 +363,7 @@ int main(void) {
         int dealer_ace_count = 0;
         if(money > 9999) money = 9999;
 
+        FND_control(money);
         //초기금액 3초간 표시
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
