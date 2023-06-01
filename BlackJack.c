@@ -231,7 +231,9 @@ void DealerCardShow(char dealer_hand[10], int hitting) {
         perror("open");
         exit(1);
     }
-    sprintf(buf, "%s", dealer_hand);
+    for(i = 0; i < 10; i++) {
+        buf[i] = dealer_hand[i];
+    }
     switch(hitting) {
         case 0:
         sprintf(guide, "%s", "Card Drawing");
