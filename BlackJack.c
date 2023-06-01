@@ -8,7 +8,7 @@
 #include <asm/ioctls.h>
 #include <time.h>
 #include <stdbool.h>
-#include<sys/stat.h> 
+#include <sys/stat.h>
 
 #define clcd "/dev/clcd"
 #define tact "/dev/tactsw"
@@ -47,41 +47,35 @@ int FND_control(int money){
 
 int Betting(int money) {
     int tactsw;
-    int clcd_d;
     int bet_money = 0;
-    // char guide[32] = "";
     unsigned char c;
-
-    // if((clcd_d = open(clcd,O_RDWR)) < 0) {
-    //     perror("open");
-    //     exit(1);
-    // }
-
-    // sprintf(guide, "%s", "Betting...");
-    // write(clcd_d, &guide, strlen(guide));
-    // close(clcd_d);
 
     if((tactsw = open(tact,O_RDWR)) < 0) {
         perror("open");
         exit(1);
     }
-    read(tactsw, &c, sizeof(c));
+
+    while (true) {
+        read(tactsw, &c, sizeof(c));
+        if (c)
+            break;
+    }
+    switch(c) {
+        case 1:
+        bet_money += 100;
+        break;
+        case 2:
+        bet_money += 200;
+        break;
+        case 3:
+        bet_money += 500;
+        break;
+        default:
+        break;
+    }
+    printf("%d\n", bet_money);
     close(tactsw);
 
-    switch(c) {
-    case 1:
-    bet_money += 100;
-    FND_control(bet_money);
-    break;
-    case 2:
-    bet_money += 200;
-    FND_control(bet_money);
-    break;
-    case 3:
-    bet_money += 500;
-    FND_control(bet_money);
-    break;
-    }
     return bet_money;
 }
 
@@ -97,24 +91,28 @@ int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
         if (arr[shape][card] != ' ') {
             *alpha_pt = arr[shape][card];
             int i = 0;
-            for (i = 0; i < 10; i++) {
+            for (i = 0; i < 16; i++) {
                 if (hand[i] == ' ') {
-                    hand[i] = arr[shape][card];
+                    hand[i + 1] = arr[shape][card];
                     break;
                 }
             }
             arr[shape][card] = ' ';
             switch (shape) {
             case 0:
+                hand[i] = 'S';
                 *shape_pt = 'S';
                 break;
             case 1:
+                hand[i] = 'C';
                 *shape_pt = 'C';
                 break;
             case 2:
+                hand[i] = 'D';
                 *shape_pt = 'D';
                 break;
             default:
+                hand[i] = 'H';
                 *shape_pt = 'H';
                 break;
             }
@@ -166,25 +164,25 @@ int Alpha_dot(char alphabet) {
 void CardShow(char shape, char alpha) {
     //dot_matrix에 띄울 문양
     unsigned char mtx[4][8] = {
-        {0x00,0x66,0xFF,0xFF,0x7E,0x3C,0x18,0x00}, //하트
-        {0x00,0x08,0x1C,0x3E,0x7F,0x3E,0x1C,0x08}, //스페이드
-        {0x18,0x00,0x18,0x3C,0x3C,0x18,0x00,0x00}, //클로버
-        {0x00,0x08,0x1C,0x3E,0x1C,0x08,0x00,0x00} //다이아몬드
+        {0x66,0xff,0xff,0xff,0xff,0x7e,0x3c,0x18}, //하트
+        {0x3c,0x7e,0xff,0xff,0xdb,0x99,0x18,0x18}, //스페이드
+        {0x66,0xe7,0xe7,0x18,0x18,0xe7,0xe7,0x66}, //클로버
+        {0x18,0x3c,0x7e,0xff,0xff,0x7e,0x3c,0x18} //다이아몬드
         };
     unsigned char mtn[13][8] = {
         {0x18,0x24,0x42,0x42,0x7E,0x42,0x42,0x42}, //A
-        {0x18,0x24,0x24,0x04,0x08,0x10,0x3c,0x00}, //2
-        {0x18,0x24,0x04,0x18,0x04,0x24,0x18,0x00}, //3
-        {0x08,0x18,0x28,0x48,0xfc,0x08,0x08,0x00}, //4
-        {0x2c,0x20,0x20,0x18,0x04,0x24,0x18,0x00}, //5
-        {0x18,0x24,0x20,0x38,0x24,0x24,0x18,0x00}, //6
-        {0x3c,0x04,0x04,0x08,0x10,0x10,0x10,0x00}, //7
-        {0x18,0x24,0x24,0x18,0x24,0x24,0x18,0x00}, //8
-        {0x18,0x24,0x24,0x1c,0x04,0x04,0x18,0x00}, //9
-        {0x26,0x69,0xa9,0x29,0x29,0x29,0x76,0x00}, //10
-        {0x1C,0x08,0x08,0x08,0x08,0x48,0x48,0x30},  //J
-        {0x38,0x44,0x82,0x82,0x82,0x8A,0x44,0x3A},  //Q
-        {0x44,0x48,0x50,0x60,0x50,0x48,0x44,0x44}  //K
+        {0x38,0x44,0x44,0x44,0x08,0x10,0x20,0x7e}, //2
+        {0x3c,0x02,0x02,0x3c,0x02,0x02,0x04,0x38}, //3
+        {0x48,0x48,0x48,0x48,0x7e,0x08,0x08,0x08}, //4
+        {0x7e,0x40,0x40,0x3c,0x02,0x02,0x42,0x3c}, //5
+        {0x3c,0x42,0x40,0x7c,0x42,0x42,0x42,0x3c}, //6
+        {0x7e,0x02,0x04,0x08,0x10,0x10,0x10,0x10}, //7
+        {0x3c,0x42,0x42,0x3c,0x42,0x42,0x42,0x3c}, //8
+        {0x3c,0x42,0x42,0x42,0x3e,0x02,0x04,0x38}, //9
+        {0x8c,0x92,0xa1,0xa1,0xa1,0xa1,0x92,0x8c}, //10
+        {0x3e,0x08,0x08,0x08,0x08,0x08,0x48,0x30}, //J
+        {0x38,0x44,0x82,0x82,0x82,0x8A,0x44,0x3A}, //Q
+        {0x44,0x48,0x50,0x60,0x50,0x48,0x44,0x44} //K
         };
 
     //예외처리
@@ -221,7 +219,7 @@ void CardShow(char shape, char alpha) {
     close(dot_mtx);
 }
 
-void DealerCardShow(char dealer_hand[10], int hitting) {
+void DealerCardShow(char dealer_hand[16], int hitting) {
     int clcd_d;
     unsigned char buf[32];
     unsigned char guide[16];
@@ -231,30 +229,57 @@ void DealerCardShow(char dealer_hand[10], int hitting) {
         perror("open");
         exit(1);
     }
-    for(i = 0; i < 10; i++) {
-        buf[i] = dealer_hand[i];
-    }
     switch(hitting) {
         case 0:
-        sprintf(guide, "%s", "Card Drawing");
-        strcat(buf, guide);
+        sprintf(buf, "%s", "                Card Drawing");
         write(clcd_d, &buf, strlen(buf));
         close(clcd_d);
         break;
         case 1:
-        sprintf(guide, "%s", "Hit or Stand");
-        strcat(buf, guide);
+        sprintf(buf, "%s", "                Hit or Stand");
         write(clcd_d, &buf, strlen(buf));
         close(clcd_d);
         break;
+        case 2:
+        sprintf(buf, "%s", "                Betting...");
+        write(clcd_d, &buf, strlen(buf));
+        close(clcd_d);
         default:
-        sprintf(buf, "%s", dealer_hand);
-        sprintf(guide, "%s", "Result...");
-        strcat(buf, guide);
+        sprintf(buf, "%s", "                Result...");
         write(clcd_d, &buf, strlen(buf));
         close(clcd_d);
         break;
     }
+}
+
+int HitCheck() {
+    int tactsw;
+    unsigned char c;
+    int check = 0;
+
+    if((tactsw = open(tact,O_RDWR)) < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    while (true) {
+        read(tactsw, &c, sizeof(c));
+        if (c)
+            break;
+    }
+    switch(c) {
+        case 1:
+        check = 1;
+        break;
+        case 2:
+        check = 2;
+        break;
+        default:
+        break;
+    }
+    close(tactsw);
+
+    return check;
 }
 
 bool HandCheck(char* arr, int *cnt) {
@@ -346,8 +371,8 @@ int main(void) {
     //게임 실행 반복문
     while (true) {
         //손패 초기화
-        char user_hand[10] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-        char dealer_hand[10] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+        char user_hand[16] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+        char dealer_hand[16] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
         int user_score = 0;
         int dealer_score = 0;
         int user_card = 0;
@@ -360,6 +385,7 @@ int main(void) {
         //초기금액 3초간 표시
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
+        DealerCardShow(dealer_hand, 2);    
         bet_money = Betting(money);
         money -= bet_money;
 
@@ -404,6 +430,7 @@ int main(void) {
         }
         else {
             while (true) {
+                DealerCardShow(dealer_hand, 1);    
                 //힛 or 스탠드 구현
                 if (user_score > 21) {
                     if (HandCheck(user_hand, &user_ace_count)) user_score -= 10;
@@ -412,7 +439,7 @@ int main(void) {
                         break;
                     }
                 }
-                if (true) {
+                if (HitCheck() == 1) {
                     user_score += Draw(&shape, &alpha, deck, user_hand);
                 }
                 else break;
