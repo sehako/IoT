@@ -238,18 +238,18 @@ void DealerCardShow(char dealer_hand[10], int hitting) {
     sprintf(buf, "%s", dealer_hand);
     switch(hitting) {
         case 0:
-        sprintf(guide, "%s", "      Card Drawing");
+        sprintf(guide, "%s", "Card Drawing");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         case 1:
-        sprintf(guide, "%s", "      Hit or Stand");
+        sprintf(guide, "%s", "Hit or Stand");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
         default:
         sprintf(buf, "%s", dealer_hand);
-        sprintf(guide, "%s", "      Result...");
+        sprintf(guide, "%s", "Result...");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         break;
