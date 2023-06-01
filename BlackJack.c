@@ -65,27 +65,11 @@ int Betting(int money) {
     write(clcd_d, &guide, strlen(guide));
     close(clcd_d);
     while(true) {
-        if(money > bet_money) {
-            switch(c) {
-                //100원
-                case 1: bet_money += 100; 
-                continue;
-                //500원
-                case 2: bet_money += 200; 
-                continue;
-                //1000원
-                case 3: bet_money += 500; 
-                continue;
-                case 7: 
-                break;
-                default: 
-                continue;
-            }
-            break;
+        if(c == 1) {
+            bet_money += 100;
+            FND_control(bet_money);
         }
-        else {
-        bet_money = money;
-        } 
+        else break;
     }
     close(dip_d);
     return bet_money;
