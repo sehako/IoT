@@ -1,10 +1,13 @@
+#include <termios.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <time.h>
-#include <string.h>
-#include <stdbool.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <asm/ioctls.h>
+#include <time.h>
+#include <stdbool.h>
 
 #define clcd "/dev/clcd"
 #define dip "/dev/dipsw"
@@ -26,21 +29,13 @@ int Betting(int money) {
         if(true) {
             switch(c) {
                 //100원
-                case 1:
-                bet_money += 100;
-                continue;
+                case 1: bet_money += 100; continue;
                 //500원
-                case 2:
-                bet_money += 200;
-                continue;
+                case 2: bet_money += 200; continue;
                 //1000원
-                case 3:
-                bet_money += 500;
-                continue;
-                case 7:
-                break;
-                default:
-                continue;
+                case 3: bet_money += 500; continue;
+                case 7: break;
+                default: continue;
             }
             break;
         }
@@ -316,7 +311,6 @@ void ResultPrint(char hand[10], int check) {
         write(clcd_d, &buf, strlen(buf));
         break;
     }
-
     close(clcd_d);
 }
 
@@ -341,30 +335,21 @@ void Finish(bool over, int num) {
 int main(void) {
     int money = 0;
     int bet_money = 0;
+    int user_money[4];
     bool user_busted = false;
     char alpha, dealer_alpha, shape, dealer_shape;
     FILE* file;
 
     //배팅 금액이 저장된 파일 로드
     file = fopen("money.txt", "r");
-    fscanf(file, "%ld", &money);
+    fscanf(file, "%d", &money);
+    if(money > 9999) money = 9999;
     fclose(file);
-
-    //fnd에 숫자를 띄우기위한 배열저장
-    file = fopen("money.txt", "r");
-
-    char money_str[5];
-    fscanf(file, "%s", money_str);
-    fclose(file);
-
-    int user_money[4] = {0};
-    int moneys = atoi(money_str);
-
-    user_money[0] = moneys / 1000;
-    user_money[1] = (moneys % 1000) / 100;
-    user_money[2] = (moneys % 100) / 10;
-    user_money[3] = moneys % 10;
-
+    
+    user_money[0] = money / 1000;
+    user_money[1] = (money % 1000) / 100;
+    user_money[2] = (money % 100) / 10;
+    user_money[3] = money % 10;
 
     //게임 실행 반복문
     while (true) {
@@ -377,9 +362,10 @@ int main(void) {
         int dealer_card = 0;
         int user_ace_count = 0;
         int dealer_ace_count = 0;
+        if(money > 9999) money = 9999;
 
         //초기금액 3초간 표시
-        // FND_control(user_money,3);
+        FND_control(user_money,3);
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
         // bet_money = Betting(money);
