@@ -178,13 +178,13 @@ void CardShow(char shape, char alpha) {
         {0x18,0x24,0x42,0x42,0x7E,0x42,0x42,0x42}, //A
         {0x3c,0x42,0x02,0x04,0x08,0x10,0x20,0x7e}, //2
         {0x3c,0x02,0x02,0x3c,0x02,0x02,0x02,0x3c}, //3
-        {0x0c,0x14,0x24,0x44,0x7e,0x08,0x08,0x08}, //4
-        {0x7e,0x40,0x40,0x7c,0x02,0x02,0x02,0x7c}, //5
+        {0x0c,0x14,0x24,0x44,0x7e,0x04,0x04,0x04}, //4
+        {0x3e,0x20,0x20,0x3c,0x02,0x02,0x02,0x3c}, //5
         {0x3c,0x42,0x40,0x7c,0x42,0x42,0x42,0x3c}, //6
         {0x7e,0x42,0x42,0x42,0x02,0x02,0x02,0x02}, //7
         {0x3c,0x42,0x42,0x3c,0x42,0x42,0x42,0x3c}, //8
-        {0x3c,0x42,0x42,0x42,0x3e,0x02,0x02,0x3c}, //9
-        {0x8c,0x92,0xa1,0xa1,0xa1,0xa1,0x92,0x8c}, //10
+        {0x3c,0x42,0x42,0x42,0x3e,0x02,0x42,0x3c}, //9
+        {0x9e,0xa1,0xa1,0xa1,0xa1,0xa1,0xa1,0x9e}, //10
         {0x3e,0x08,0x08,0x08,0x08,0x08,0x48,0x30}, //J
         {0x38,0x44,0x82,0x82,0x82,0x8A,0x44,0x3A}, //Q
         {0x42,0x44,0x48,0x70,0x50,0x48,0x44,0x42} //K
@@ -224,7 +224,7 @@ void CardShow(char shape, char alpha) {
     close(dot_mtx);
 }
 
-void DealerCardShow(char dealer_hand[16], int hitting) {
+void DealerCardShow(int score, char dealer_hand[16], int hitting) {
     int clcd_d;
     unsigned char buf[32] = "";
     unsigned char guide[16] = "";
@@ -248,7 +248,7 @@ void DealerCardShow(char dealer_hand[16], int hitting) {
         case 1:
         buf[2] = ' ';
         buf[3] = ' ';
-        sprintf(guide, "%s", "Hit or Stand");
+        sprintf(guide, "%d %s", score, "Hit or Stand");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         close(clcd_d);
@@ -258,7 +258,7 @@ void DealerCardShow(char dealer_hand[16], int hitting) {
         write(clcd_d, &guide, strlen(guide));
         close(clcd_d);
         default:
-        sprintf(guide, "%s", "Result...");
+        sprintf(guide, "%d %s", score, "Result...");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         close(clcd_d);
@@ -299,13 +299,13 @@ int HitCheck() {
 bool HandCheck(char* arr, int *cnt) {
     int i = 0;
     int count = 0;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 16; i++) {
         if (arr[i] == 'A') {
             count++;
         }
     }
     if(count > *cnt) {
-        *cnt++;
+        *cnt = *cnt + 1;
         return true;
     }
     else {
@@ -433,9 +433,10 @@ int main(void) {
         //초기금액 3초간 표시
         //LCD로 배팅금 입력 부분 출력
         //딥 스위치로 배팅금 입력
-        DealerCardShow(dealer_hand, 2);    
+        DealerCardShow(user_score, dealer_hand, 2);    
         bet_money = Betting(money);
         money -= bet_money;
+        FND_control(bet_money);
 
         //행 부분은 카드 문양 열 부분은 카드 값
         unsigned char deck[4][13] = { 
@@ -451,10 +452,10 @@ int main(void) {
 
 
         //첫 번째 카드 출력(딜러는 LCD, 플레이어는 Dot Matrix)
-        DealerCardShow(dealer_hand, 0);
-        sleep(2);        
+        DealerCardShow(user_score, dealer_hand, 0);
+        sleep(1);        
         CardShow(shape, alpha);
-        sleep(2);
+        sleep(1);
 
         //두 번째 카드 분배
         user_score += Draw(&shape, &alpha, deck, user_hand);
@@ -462,7 +463,7 @@ int main(void) {
 
         //두 번째 카드 출력(플레이어만)
         CardShow(shape, alpha);
-        sleep(2);
+        sleep(1);
 
         //초반 시작 부분에서 에이스 두 장 뽑으면 자동으로 11, 1로 취급
         if (user_score > 21) {
@@ -481,7 +482,7 @@ int main(void) {
         }
         else {
             while (true) {
-                DealerCardShow(dealer_hand, 1);    
+                DealerCardShow(user_score, dealer_hand, 1);    
                 if (HitCheck() == 1) {
                     user_score += Draw(&shape, &alpha, deck, user_hand);
                     CardShow(shape, alpha);
@@ -505,7 +506,7 @@ int main(void) {
             bool dealer_bust = false;
             //딜러가 가진 카드의 합이 16이하인 경우 딜러는 무조건 드로우
             while (dealer_score <= 16) {
-                DealerCardShow(dealer_hand, 0);
+                DealerCardShow(user_score, dealer_hand, 0);
                 sleep(2);
                 dealer_score += Draw(&dealer_shape, &dealer_alpha, deck, dealer_hand);
                 if (dealer_score > 21) {
