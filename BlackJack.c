@@ -90,7 +90,7 @@ int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
         if (arr[shape][card] != ' ') {
             *alpha_pt = arr[shape][card];
             int i = 0;
-            for (i = 0; i < 16; i++) {
+            for (i; i < 16; i++) {
                 if (hand[i] == ' ') {
                     if(arr[shape][card] == '0') {
                         hand[i + 1] == '1';
@@ -257,6 +257,10 @@ void DealerCardShow(int score, char dealer_hand[16], int hitting) {
         sprintf(guide, "%s", "Betting...      100   200   500");
         write(clcd_d, &guide, strlen(guide));
         close(clcd_d);
+        case 3:
+        sprintf(guide, "%s", "                        All in!");
+        write(clcd_d, &guide, strlen(guide));
+        close(clcd_d);
         default:
         sprintf(guide, "%d %s", score, "Result...");
         strcat(buf, guide);
@@ -376,7 +380,7 @@ void ResultPrint(char hand[16], int check) {
         sleep(3);
         break;        
         case 8:
-        sprintf(buf, "%s", "                                ");
+        sprintf(buf, "%s", "                               ");
         write(clcd_d, &buf, strlen(buf));
         break;
         default:
@@ -435,7 +439,13 @@ int main(void) {
         //딥 스위치로 배팅금 입력
         DealerCardShow(user_score, dealer_hand, 2);    
         bet_money = Betting(money);
-        money -= bet_money;
+        if (bet_money > money) {
+            DealerCardShow(user_score, dealer_hand, 3);
+            bet_money = money;
+        }
+        else {
+            money -= bet_money;
+        }
         FND_control(bet_money);
 
         //행 부분은 카드 문양 열 부분은 카드 값
@@ -552,7 +562,9 @@ int main(void) {
 
         ResultPrint(dealer_hand, 5);
         //재시작 부분
-        if (HitCheck() == 1) continue;
+        if (HitCheck() == 1) {
+            continue;
+        }
         else {
             //사용자 종료 시 계산된 최종 배팅금을 파일에 저장
             ResultPrint(dealer_hand, 6);
