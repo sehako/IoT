@@ -81,6 +81,7 @@ int Betting(int money) {
 //덱 드로우 함수
 int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
     int value = 0;
+    char ten[3];
     while (true) {
         srand(time(NULL));
         int shape = rand() % 4;
@@ -89,38 +90,39 @@ int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
 
         if (arr[shape][card] != ' ') {
             *alpha_pt = arr[shape][card];
+            switch (shape) {
+            case 0:
+            *shape_pt = 'S';
+            break;
+            case 1:
+            *shape_pt = 'C';
+            break;
+            case 2:
+            *shape_pt = 'D';
+            break;
+            default:
+            *shape_pt = 'H';
+            break;
+            }
+
             int i = 0;
             for (i; i < 16; i++) {
                 if (hand[i] == ' ') {
                     if(arr[shape][card] == '0') {
-                        hand[i + 1] == '1';
-                        hand[i + 2] == '0';
+                        sprintf(ten, "%c%d", *shape_pt, 10);
+                        hand[i] = ten[0];
+                        hand[i + 1] = ten[1];
+                        hand[i + 2] = ten[2];
                     }
                     else {
+                        hand[i] = *shape_pt;
                         hand[i + 1] = arr[shape][card];
                     }
                     break;
                 }
             }
             arr[shape][card] = ' ';
-            switch (shape) {
-            case 0:
-                hand[i] = 'S';
-                *shape_pt = 'S';
-                break;
-            case 1:
-                hand[i] = 'C';
-                *shape_pt = 'C';
-                break;
-            case 2:
-                hand[i] = 'D';
-                *shape_pt = 'D';
-                break;
-            default:
-                hand[i] = 'H';
-                *shape_pt = 'H';
-                break;
-            }
+
             switch (card) {
             case 0:
                 value = 11;
@@ -202,23 +204,23 @@ void CardShow(char shape, char alpha) {
     switch (shape) {
         case 'S':
             write(dot_mtx, &mtx[1], sizeof(mtx[1])); //스페이드 출력
-            usleep(3000000); //3초동안 점등
-            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(3000000);
+            usleep(2000000); //3초동안 점등
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(2000000);
             break;
         case 'C':
             write(dot_mtx, &mtx[2], sizeof(mtx[2])); //클로버 출력
-            usleep(3000000); //3초동안 점등
-            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(3000000);
+            usleep(2000000); //3초동안 점등
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(2000000);
             break;
         case 'D':
             write(dot_mtx, &mtx[3], sizeof(mtx[3])); //다이아몬드 출력
-            usleep(3000000); //3초동안 점등
-            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(3000000);
+            usleep(2000000); //3초동안 점등
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(2000000);
             break;
         default:
             write(dot_mtx, &mtx[0], sizeof(mtx[0])); //하트 출력
-            usleep(3000000); //3초동안 점등
-            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(3000000);
+            usleep(2000000); //3초동안 점등
+            write(dot_mtx, &mtn[pos], sizeof(mtn[pos])); usleep(2000000);
             break;
     }
     close(dot_mtx);
@@ -229,9 +231,13 @@ void DealerCardShow(int score, char dealer_hand[16], int hitting) {
     unsigned char buf[32] = "";
     unsigned char guide[16] = "";
     int i;
+    bool ten = false;
 
     for(i = 0; i < 16; i++) {
         buf[i] = dealer_hand[i];
+        if(dealer_hand[i] == '1') {
+            ten = true;
+        }
     }
 
     if((clcd_d = open(clcd,O_RDWR)) < 0){
@@ -240,15 +246,22 @@ void DealerCardShow(int score, char dealer_hand[16], int hitting) {
     }
     switch(hitting) {
         case 0:
-        sprintf(guide, "%s", "Card Drawing");
+        sprintf(guide, "%s", "Card Drawing...");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         close(clcd_d);
         break;
         case 1:
-        buf[2] = ' ';
-        buf[3] = ' ';
-        sprintf(guide, "%d %s", score, "Hit or Stand");
+        if(ten) {
+            buf[2] = ' ';
+            buf[3] = ' ';
+            buf[4] = ' ';
+        }
+        else {
+            buf[2] = ' ';
+            buf[3] = ' ';
+        }
+        sprintf(guide, "%d%s", score, " Hit or Stand");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         close(clcd_d);
@@ -258,7 +271,7 @@ void DealerCardShow(int score, char dealer_hand[16], int hitting) {
         write(clcd_d, &guide, strlen(guide));
         close(clcd_d);
         case 3:
-        sprintf(guide, "%s", "                        All in!");
+        sprintf(guide, "%s", "All in!");
         write(clcd_d, &guide, strlen(guide));
         close(clcd_d);
         default:
@@ -317,11 +330,12 @@ bool HandCheck(char* arr, int *cnt) {
     }
 }
 
-void ResultPrint(char hand[16], int check) {
+void ResultPrint(int score, char hand[16], int check) {
     int clcd_d;
     int i;
     unsigned char buf[32] = "";
     unsigned char guide[16] = "";
+    bool ten = false;
     if((clcd_d = open(clcd,O_RDWR)) < 0) {
         perror("open");
         exit(1);
@@ -329,11 +343,14 @@ void ResultPrint(char hand[16], int check) {
 
     for(i = 0; i < 16; i++) {
         buf[i] = hand[i];
+        if(hand[i] == '1') {
+            ten = true;
+        }
     }
 
     switch(check) {
         case 0:
-        sprintf(guide, "%s", "You Win!");
+        sprintf(guide, "%d %s", score, "You Win!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
         sleep(3);
@@ -350,6 +367,15 @@ void ResultPrint(char hand[16], int check) {
         sleep(3);
         break;
         case 3:
+        if(ten) {
+            buf[2] = ' ';
+            buf[3] = ' ';
+            buf[4] = ' ';
+        }
+        else {
+            buf[2] = ' ';
+            buf[3] = ' ';
+        }
         sprintf(guide, "%s", "BlackJack!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
@@ -372,8 +398,15 @@ void ResultPrint(char hand[16], int check) {
         sleep(3);
         break;
         case 7:
-        buf[2] = ' ';
-        buf[3] = ' ';
+        if(ten) {
+            buf[2] = ' ';
+            buf[3] = ' ';
+            buf[4] = ' ';
+        }
+        else {
+            buf[2] = ' ';
+            buf[3] = ' ';
+        }
         sprintf(guide, "%s", "You Busted!");
         strcat(buf, guide);
         write(clcd_d, &buf, strlen(buf));
@@ -383,6 +416,9 @@ void ResultPrint(char hand[16], int check) {
         sprintf(buf, "%s", "                               ");
         write(clcd_d, &buf, strlen(buf));
         break;
+        case 9:
+        sprintf(buf, "%s", "Welcome to      Blackjack!!");
+        write(clcd_d, &buf, strlen(buf)); 
         default:
         break;
     }
@@ -392,12 +428,13 @@ void ResultPrint(char hand[16], int check) {
 //게임 종료 or 오버 시 파일 처리
 void Finish(bool over, int num) {
     FILE* file;
+    int n;
     file = fopen("money.txt", "w");
-    char fake[16] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
-    ResultPrint(fake, 8);
+    char fake[16];
+    ResultPrint(n, fake, 8);
 
     if (over) {
-        num = 5000;
+        num = 900;
         fprintf(file, "%ld", num);
     }
     else {
@@ -412,8 +449,10 @@ int main(void) {
     int bet_money = 0;
     bool user_busted = false;
     char alpha, dealer_alpha, shape, dealer_shape;
+    char fake[16];
     FILE* file;
 
+    ResultPrint(money, fake, 9);
     //배팅 금액이 저장된 파일 로드
     file = fopen("money.txt", "r");
     fscanf(file, "%d", &money);
@@ -431,6 +470,7 @@ int main(void) {
         int dealer_card = 0;
         int user_ace_count = 0;
         int dealer_ace_count = 0;
+        bool blackjack = false;
         if(money > 9999) money = 9999;
 
         FND_control(money);
@@ -442,6 +482,7 @@ int main(void) {
         if (bet_money > money) {
             DealerCardShow(user_score, dealer_hand, 3);
             bet_money = money;
+            money = 0;
         }
         else {
             money -= bet_money;
@@ -486,9 +527,9 @@ int main(void) {
         }
 
         if (user_score == 21) {
-            ResultPrint(dealer_hand, 3);
+            //블랙잭
             money += bet_money * 2;
-            break;
+            blackjack = true;
         }
         else {
             while (true) {
@@ -509,10 +550,11 @@ int main(void) {
             }
         }
         if (user_busted) {
-            ResultPrint(dealer_hand, 7);  
+            ResultPrint(user_score, dealer_hand, 7);
+            FND_control(money);  
             user_busted = false;
         }
-        else {
+        else if (blackjack == false && user_busted == false){
             bool dealer_bust = false;
             //딜러가 가진 카드의 합이 16이하인 경우 딜러는 무조건 드로우
             while (dealer_score <= 16) {
@@ -528,46 +570,51 @@ int main(void) {
                 }
             }
 
+            if (blackjack) {
+                //블랙잭 부분 LCD 구현
+                ResultPrint(user_score, dealer_hand, 3);
+                FND_control(money);
+            }
             //승패 계산
-            if (dealer_bust) {
+            else if (dealer_bust) {
                 //딜러 버스트 부분 LCD 구현
-                printf("%d", dealer_score);
-                ResultPrint(dealer_hand, 0);
+                ResultPrint(user_score, dealer_hand, 0);
                 money += bet_money * 2;
+                FND_control(money);
             }
             else if (user_score > dealer_score) {
                 //플레이어 승리 부분 LCD 구현
-                printf("%d", dealer_score);
-                ResultPrint(dealer_hand, 0);
+                ResultPrint(user_score, dealer_hand, 0);
                 money += bet_money * 2;
+                FND_control(money);
             }
             else if (user_score == dealer_score) {
                 //무승부 부분 LCD 구현
-                printf("%d", dealer_score);
-                ResultPrint(dealer_hand, 1);
+                ResultPrint(user_score, dealer_hand, 1);
                 money += bet_money;
+                FND_control(money);
             }
             else {
                 //패배
-                printf("%d", dealer_score);
-                ResultPrint(dealer_hand, 4);
+                ResultPrint(user_score, dealer_hand, 4);
+                FND_control(money);
             }
         }
         if (money == 0) {
-            ResultPrint(dealer_hand, 2);
+            ResultPrint(user_score, dealer_hand, 2);
             //소지금 전부 소진 시
             Finish(true, money);
             break;
         }
 
-        ResultPrint(dealer_hand, 5);
+        ResultPrint(user_score, dealer_hand, 5);
         //재시작 부분
         if (HitCheck() == 1) {
             continue;
         }
         else {
             //사용자 종료 시 계산된 최종 배팅금을 파일에 저장
-            ResultPrint(dealer_hand, 6);
+            ResultPrint(user_score, dealer_hand, 6);
             Finish(false, money);
             break;
         }
