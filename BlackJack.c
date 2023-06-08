@@ -253,9 +253,9 @@ void DealerCardShow(int score, char dealer_hand[16], int hitting) {
         break;
         case 1:
         if(ten) {
-            buf[2] = ' ';
             buf[3] = ' ';
             buf[4] = ' ';
+            buf[5] = ' ';
         }
         else {
             buf[2] = ' ';
@@ -368,9 +368,9 @@ void ResultPrint(int score, char hand[16], int check) {
         break;
         case 3:
         if(ten) {
-            buf[2] = ' ';
             buf[3] = ' ';
             buf[4] = ' ';
+            buf[5] = ' ';
         }
         else {
             buf[2] = ' ';
@@ -399,9 +399,9 @@ void ResultPrint(int score, char hand[16], int check) {
         break;
         case 7:
         if(ten) {
-            buf[2] = ' ';
             buf[3] = ' ';
             buf[4] = ' ';
+            buf[5] = ' ';
         }
         else {
             buf[2] = ' ';
