@@ -260,6 +260,7 @@ void DealerCardShow(int score, char dealer_hand[16], int hitting) {
         else {
             buf[2] = ' ';
             buf[3] = ' ';
+            buf[4] = ' ';
         }
         sprintf(guide, "%d%s", score, " Hit or Stand");
         strcat(buf, guide);
@@ -375,6 +376,7 @@ void ResultPrint(int score, char hand[16], int check) {
         else {
             buf[2] = ' ';
             buf[3] = ' ';
+            buf[4] = ' ';
         }
         sprintf(guide, "%s", "BlackJack!");
         strcat(buf, guide);
@@ -406,6 +408,7 @@ void ResultPrint(int score, char hand[16], int check) {
         else {
             buf[2] = ' ';
             buf[3] = ' ';
+            buf[4] = ' ';
         }
         sprintf(guide, "%s", "You Busted!");
         strcat(buf, guide);
@@ -570,6 +573,7 @@ int main(void) {
                     }
                 }
             }
+            
             //승패 계산
             if (dealer_bust) {
                 dealer_bust = false;
