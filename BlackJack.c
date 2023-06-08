@@ -471,6 +471,7 @@ int main(void) {
         int user_ace_count = 0;
         int dealer_ace_count = 0;
         bool blackjack = false;
+        bool dealer_bust = false;
         if(money > 9999) money = 9999;
 
         FND_control(money);
@@ -549,13 +550,13 @@ int main(void) {
                 else break;
             }
         }
+
         if (user_busted) {
             ResultPrint(user_score, dealer_hand, 7);
             FND_control(money);  
             user_busted = false;
         }
         else if (blackjack == false && user_busted == false){
-            bool dealer_bust = false;
             //딜러가 가진 카드의 합이 16이하인 경우 딜러는 무조건 드로우
             while (dealer_score <= 16) {
                 DealerCardShow(user_score, dealer_hand, 0);
@@ -569,14 +570,9 @@ int main(void) {
                     }
                 }
             }
-
-            if (blackjack) {
-                //블랙잭 부분 LCD 구현
-                ResultPrint(user_score, dealer_hand, 3);
-                FND_control(money);
-            }
             //승패 계산
-            else if (dealer_bust) {
+            if (dealer_bust) {
+                dealer_bust = false;
                 //딜러 버스트 부분 LCD 구현
                 ResultPrint(user_score, dealer_hand, 0);
                 money += bet_money * 2;
@@ -600,6 +596,12 @@ int main(void) {
                 FND_control(money);
             }
         }
+        if (blackjack) {
+            //블랙잭 부분 LCD 구현
+            ResultPrint(user_score, dealer_hand, 3);
+            FND_control(money);
+        }
+
         if (money == 0) {
             ResultPrint(user_score, dealer_hand, 2);
             //소지금 전부 소진 시
