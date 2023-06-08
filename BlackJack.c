@@ -233,9 +233,9 @@ void DealerCardShow(int score, char dealer_hand[16], int hitting) {
     int i;
     bool ten = false;
 
-    for(i = 0; i < 3; i++) {
+    for(i = 0; i < 16; i++) {
         buf[i] = dealer_hand[i];
-        if(dealer_hand[i] == '1') {
+        if(dealer_hand[1] == '1') {
             ten = true;
         }
     }
@@ -341,9 +341,9 @@ void ResultPrint(int score, char hand[16], int check) {
         exit(1);
     }
 
-    for(i = 0; i < 3; i++) {
+    for(i = 0; i < 16; i++) {
         buf[i] = hand[i];
-        if(hand[i] == '1') {
+        if(hand[1] == '1') {
             ten = true;
         }
     }
