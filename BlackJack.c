@@ -600,6 +600,7 @@ int main(void) {
                 FND_control(money);
             }
         }
+        
         if (blackjack) {
             //블랙잭 부분 LCD 구현
             ResultPrint(user_score, dealer_hand, 3);
