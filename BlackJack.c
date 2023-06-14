@@ -439,11 +439,11 @@ void Finish(bool over, int num) {
 
     if (over) {
         num = 900;
-        fprintf(file, "%ld", num);
+        fprintf(file, "%d", num);
     }
     else {
         if(num > 9999) num = 9999;
-        fprintf(file, "%ld", num);
+        fprintf(file, "%d", num);
     }
     fclose(file);
 }
