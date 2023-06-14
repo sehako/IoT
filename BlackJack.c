@@ -87,7 +87,8 @@ int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
         int shape = rand() % 4;
         srand(time(NULL));
         int card = rand() % 13;
-
+        srand(time(NULL));
+        
         if (arr[shape][card] != ' ') {
             *alpha_pt = arr[shape][card];
             switch (shape) {
@@ -541,6 +542,10 @@ int main(void) {
                 if (HitCheck() == 1) {
                     user_score += Draw(&shape, &alpha, deck, user_hand);
                     CardShow(shape, alpha);
+                    if (user_score == 21) {
+                        blackjack = true;
+                        break;
+                    }
                     //힛 or 스탠드 구현
                     if (user_score > 21) {
                         if (HandCheck(user_hand, &user_ace_count)) user_score -= 10;
