@@ -88,7 +88,7 @@ int Draw(char* shape_pt, char* alpha_pt, unsigned char arr[4][13], char* hand) {
         srand(time(NULL));
         int card = rand() % 13;
         srand(time(NULL));
-        
+
         if (arr[shape][card] != ' ') {
             *alpha_pt = arr[shape][card];
             switch (shape) {
@@ -285,10 +285,10 @@ void DealerCardShow(int score, char dealer_hand[16], int hitting) {
     }
 }
 
-int HitCheck() {
+bool HitCheck() {
     int tactsw;
     unsigned char c = 0;
-    int check = 0;
+    bool check = false;
 
     if((tactsw = open(tact,O_RDWR)) < 0) {
         perror("open");
@@ -303,10 +303,10 @@ int HitCheck() {
     close(tactsw);
     switch(c) {
         case 1:
-        check = 1;
+        check = true;
         break;
         case 2:
-        check = 2;
+        check = false;
         break;
         default:
         break;
@@ -539,7 +539,7 @@ int main(void) {
         else {
             while (true) {
                 DealerCardShow(user_score, dealer_hand, 1);    
-                if (HitCheck() == 1) {
+                if (HitCheck()) {
                     user_score += Draw(&shape, &alpha, deck, user_hand);
                     CardShow(shape, alpha);
                     if (user_score == 21) {
@@ -621,7 +621,7 @@ int main(void) {
 
         ResultPrint(user_score, dealer_hand, 5);
         //재시작 부분
-        if (HitCheck() == 1) {
+        if (HitCheck()) {
             continue;
         }
         else {
