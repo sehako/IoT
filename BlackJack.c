@@ -484,7 +484,7 @@ int main(void) {
         //딥 스위치로 배팅금 입력
         DealerCardShow(user_score, dealer_hand, 2);    
         bet_money = Betting(money);
-        if (bet_money > money) {
+        if (bet_money >= money) {
             DealerCardShow(user_score, dealer_hand, 3);
             bet_money = money;
             money = 0;
